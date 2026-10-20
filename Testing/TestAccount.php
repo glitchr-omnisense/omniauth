@@ -16,6 +16,8 @@ final class TestAccount
     public array $backupCodes = [];
     /** @var array<string, string> provider => subject */
     public array $identities = [];
+    /** @var array<string, array{email: ?string, emailVerified: bool, usedAt: ?int}> provider => what the link kept: the address then, whether it was vouched for, when it last served */
+    public array $identityDetails = [];
 
     public function __construct(
         public string $handle,

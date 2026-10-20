@@ -156,9 +156,24 @@ final class InMemoryStore implements Accounts, Passwords, LinkTokens, PlainLinkT
         return null;
     }
 
-    public function link(object $account, string $provider, string $subject): void
+    public function link(object $account, string $provider, string $subject, ?string $email = null, bool $emailVerified = false): void
     {
         self::of($account)->identities[$provider] = $subject;
+        self::of($account)->identityDetails[$provider] = ['email' => $email, 'emailVerified' => $emailVerified, 'usedAt' => null];
+    }
+
+    public function unlink(object $account, string $provider): void
+    {
+        unset(self::of($account)->identities[$provider], self::of($account)->identityDetails[$provider]);
+    }
+
+    public function used(string $provider, string $subject, \DateTimeImmutable $at): void
+    {
+        $account = $this->owner($provider, $subject);
+        if (null !== $account) {
+            $details = self::of($account)->identityDetails[$provider] ?? [];
+            self::of($account)->identityDetails[$provider] = ['email' => $details['email'] ?? null, 'emailVerified' => $details['emailVerified'] ?? false, 'usedAt' => $at->getTimestamp()];
+        }
     }
 
     public function providers(object $account): array
