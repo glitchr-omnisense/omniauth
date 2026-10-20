@@ -5,7 +5,8 @@
  * each method package from a checkout under /omniauth/plugins when there is
  * one, from GitHub (branch 1.x) otherwise; every package's tests in one run.
  * scheb/2fa is a development dependency here only: the trusted-device tests
- * compare omniauth's tokens with its JwtTokenEncoder's. Files are rewritten
+ * compare omniauth's tokens with its JwtTokenEncoder's, omniauth/totp's its
+ * TOTP codes; a method package adds its own (plugins.php). Files are rewritten
  * only when they change, so the entrypoint knows when to install.
  */
 $plugins = require __DIR__.'/plugins.php';
@@ -18,7 +19,10 @@ $require = ['omniscient/omniauth' => '1.x-dev'];
 $tests = ['Omniauth\\Tests\\' => "$core/Tests/"];
 $suites = ['core' => "$core/Tests"];
 $packages = [];
-foreach ($plugins as $slug => [$testsNs]) {
+$dev = [];
+foreach ($plugins as $slug => $plugin) {
+    [$testsNs, $needs] = $plugin + [1 => []];
+    $dev += $needs;
     $name = "omniauth/$slug";
     $dir = "$local/$slug";
     $meta = is_file("$dir/composer.json") ? json_decode((string) file_get_contents("$dir/composer.json"), true) : null;
@@ -48,7 +52,7 @@ $composer = [
         'phpunit/phpunit' => '^11.0',
         'scheb/2fa' => '^8.0',
         'symfony/cache' => '^6.4|^7.0|^8.0',
-    ],
+    ] + $dev,
     'autoload-dev' => ['psr-4' => $tests],
     'minimum-stability' => 'dev',
     'prefer-stable' => true,

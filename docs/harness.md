@@ -8,7 +8,10 @@ order: 12
 `docker/` runs this package with every `omniauth/*` method package - from GitHub (branch 1.x), or
 from the checkouts beside this one when `OMNIAUTH_PLUGINS=../..` is set in `docker/.env` - on PHP
 8.4, with scheb/2fa installed beside them as a development dependency (the trusted-device tokens
-are compared with its encoder's). Nothing runs on the host.
+are compared with its encoder's, omniauth/totp's codes with its TOTP authenticator's), and what each
+method package's tests need beside it (`docker/harness/plugins.php`: doctrine/dbal and
+web-auth/webauthn-symfony-bundle for omniauth/passkey's comparison with the bundle's records).
+Nothing runs on the host.
 
 ```sh
 cd docker && cp .env.dist .env       # the checkouts of the workspace
