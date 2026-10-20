@@ -1,0 +1,86 @@
+#!/usr/bin/env php
+<?php
+
+/*
+ * Omniauth in plain PHP: no bundle, no container, no framework. The
+ * conductor built by hand over the in-memory stores; a password alone; a
+ * password, then a code by e-mail with "trust this browser", then the same
+ * account again on that browser (no code asked); a backup code; a sign-in
+ * link, then the same link again; a password hashed by Symfony for more than
+ * 72 bytes; six wrong passwords. Prints what happened and every class and
+ * file PHP loaded, as JSON.
+ */
+
+use Omniauth\ArrayState;
+use Omniauth\BackupCode\BackupCodeMethod;
+use Omniauth\CacheThrottle;
+use Omniauth\Context;
+use Omniauth\EmailCode\EmailCodeMethod;
+use Omniauth\Link\LinkMethod;
+use Omniauth\Method\Methods;
+use Omniauth\Omniauth;
+use Omniauth\Password\PasswordMethod;
+use Omniauth\Result;
+use Omniauth\Testing\ArrayCache;
+use Omniauth\Testing\FixedClock;
+use Omniauth\Testing\InMemoryStore;
+use Omniauth\Testing\RecordingSender;
+use Omniauth\Testing\TestAccount;
+use Omniauth\TrustedDevice\TrustedDevices;
+use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
+
+require getenv('OMNIAUTH_AUTOLOAD') ?: '/harness/vendor/autoload.php';
+
+$secret = 'a-kernel-secret-of-thirty-two-bytes-or-more';
+$clock = new FixedClock('2026-10-20 12:00:00.250000 UTC');
+$hasher = new NativePasswordHasher(cost: 4);
+$long = str_repeat('Fujisan at dawn, ', 6);   // 102 bytes: Symfony prehashes it
+$store = new InMemoryStore(
+    new TestAccount('1', 'ringo', 'ringo@example.org', $hasher->hash('yellow-submarine')),
+    $paul = new TestAccount('2', 'paul', 'paul@example.org', $hasher->hash('let-it-be'), emailCodeEnabled: true),
+    new TestAccount('3', 'george', 'george@example.org', $hasher->hash($long)),
+);
+$paul->backupCodes = [password_hash('A1B2C3-D4E5F6', PASSWORD_BCRYPT, ['cost' => 4])];
+$sender = new RecordingSender();
+$session = [];
+$methods = new Methods([
+    new PasswordMethod($store, $store, $hasher),
+    new LinkMethod($store, $store, $sender, clock: $clock),
+    new EmailCodeMethod($store, $store->emailCodes(), $sender, $secret, clock: $clock),
+    new BackupCodeMethod($store),
+    $devices = new TrustedDevices($store, $store, $secret, clock: $clock),
+]);
+$omniauth = new Omniauth($store, $methods, new ArrayState($session), throttle: new CacheThrottle(new ArrayCache($clock), clock: $clock), clock: $clock);
+$context = new Context('https://example.localhost', 'example.localhost', '172.18.0.1');
+$seen = static fn (Result $r) => ['status' => $r->status->value, 'account' => $r->account?->identifier, 'passed' => array_map(fn ($f) => $f->value, $r->passed), 'offered' => array_map(fn ($f) => $f->value, $r->offered), 'failure' => $r->failure?->value, 'remember' => $r->remember, 'trustDevice' => null !== $r->trustDevice];
+
+$report['password'] = $seen($omniauth->verify('password', $context, ['identifier' => 'ringo@example.org', 'password' => 'yellow-submarine']));
+
+$report['two-steps'][] = $seen($omniauth->verify('password', $context, ['identifier' => 'paul', 'password' => 'let-it-be']));
+$report['two-steps'][] = $omniauth->begin('email-code', $context)->kind;
+$report['two-steps'][] = $seen($result = $omniauth->verify('email-code', $context, ['code' => $sender->last()->secret, 'trust' => true]));
+$report['two-steps'][] = $seen($omniauth->verify('password', new Context('https://example.localhost', 'example.localhost', '172.18.0.1', trustedDevice: $result->trustDevice), ['identifier' => 'paul', 'password' => 'let-it-be']));
+$report['cookie'] = $result->trustDevice;
+
+$omniauth->verify('password', $context, ['identifier' => 'paul', 'password' => 'let-it-be']);
+$report['backup-code'] = [$seen($omniauth->verify('backup-code', $context, ['code' => 'a1b2c3-d4e5f6'])), count($paul->backupCodes)];
+
+$omniauth->begin('link', $context, ['identifier' => 'ringo@example.org']);
+$token = $sender->last()->secret;
+$report['link'] = [$seen($omniauth->verify('link', $context, ['token' => $token])), $seen($omniauth->verify('link', $context, ['token' => $token]))];
+
+$report['long-password'] = [$seen($omniauth->verify('password', $context, ['identifier' => 'george', 'password' => $long])), password_verify($long, $store->hash($store->byHandle('3')))];
+
+for ($i = 0; $i < 6; ++$i) {
+    $report['throttle'][] = $omniauth->verify('password', $context, ['identifier' => 'ringo', 'password' => 'wrong'])->failure?->value;
+}
+
+$autoload = getenv('OMNIAUTH_AUTOLOAD') ?: '/harness/vendor/autoload.php';
+$report['loaded'] = [
+    'symbols' => [...get_declared_classes(), ...get_declared_interfaces(), ...get_declared_traits()],
+    'files' => array_map('realpath', get_included_files()),
+    // What Composer includes for every package at start (autoload "files"), whatever runs.
+    'eager' => array_map('realpath', array_values(is_file($files = dirname($autoload).'/composer/autoload_files.php') ? require $files : [])),
+];
+
+echo json_encode($report, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), "\n";

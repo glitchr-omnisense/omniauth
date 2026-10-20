@@ -1,0 +1,27 @@
+# omniscient/omniauth with every omniauth/* method package:
+#
+#   docker compose run --rm omniauth test     # every package's tests (scheb/2fa beside them, for the trusted-device tokens)
+#   docker compose run --rm omniauth bare     # plain PHP: a whole sign-in by hand - and what PHP loaded
+#   docker compose down -v                    # the harness's volume gone
+#
+# Method packages come from GitHub (branch 1.x) unless their checkout sits
+# under OMNIAUTH_PLUGINS (set it to ../.. in .env when this core sits in the
+# workspace beside them): then that checkout is what runs.
+name: omniauth-harness
+
+services:
+  omniauth:
+    build: .
+    image: omniscient/omniauth-harness
+    # One service, no server beside it: Docker's default bridge, no network of its own to create.
+    network_mode: bridge
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - ..:/omniauth/core
+      - ${OMNIAUTH_PLUGINS:-./plugins}:/omniauth/plugins:ro
+      - harness:/harness
+
+volumes:
+  harness:
