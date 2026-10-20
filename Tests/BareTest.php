@@ -75,7 +75,8 @@ final class BareTest extends TestCase
      * The files loaded from outside the package but those allowed - and those
      * Composer includes for every package at start (autoload "files":
      * polyfills, functions, and what they include beside them), which say
-     * nothing of what omniauth uses.
+     * nothing of what omniauth uses. Installed alone, the package's vendor/
+     * sits in its own directory: what is under it is outside all the same.
      *
      * @return list<string>
      */
@@ -84,7 +85,7 @@ final class BareTest extends TestCase
         $root = realpath(\dirname(__DIR__)).'/';
         $eager = array_map('dirname', array_filter($eager));
 
-        return array_values(array_filter($files, static fn (?string $file) => null !== $file && !str_starts_with($file, $root) && !\in_array(\dirname($file), $eager, true) && !preg_match(self::ALLOWED_FILES, $file)));
+        return array_values(array_filter($files, static fn (?string $file) => null !== $file && (!str_starts_with($file, $root) || str_starts_with($file, $root.'vendor/')) && !\in_array(\dirname($file), $eager, true) && !preg_match(self::ALLOWED_FILES, $file)));
     }
 
     /** The autoloader that knows omniauth and its tests: not the one that loaded PHPUnit first, should they differ. */
