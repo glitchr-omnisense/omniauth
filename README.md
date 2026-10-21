@@ -42,8 +42,9 @@ of their own; the hosts are bridged in omnibridge:
 | `omniscient/omniauth` (here) | the contracts, the conductor, the methods that need no library: password, sign-in link, code by e-mail, backup codes, trusted devices; events; `Testing\` |
 | [`omniauth/passkey`](https://github.com/glitchr-studio/omniauth-passkey) | passkeys, over web-auth/webauthn-lib; compatible both ways with web-auth/webauthn-symfony-bundle's records |
 | [`omniauth/totp`](https://github.com/glitchr-studio/omniauth-totp) | authenticator applications, over spomky-labs/otphp, on scheb/2fa's parameters; a code once |
-| `omniauth/oauth` (to come) | identity providers (Google first), over league/oauth2-client |
-| omnibridge/symfony, omnibridge/laravel (to come) | an authenticator per firewall; a guard and a user provider |
+| [`omniauth/oauth`](https://github.com/glitchr-studio/omniauth-oauth) | sign-in through identity providers, with no OAuth library: the state, PKCE and nonce, the linking by `sub`, the sign-up of an unknown identity |
+| [`omniauth/google`](https://github.com/glitchr-studio/omniauth-google) | Google, over league/oauth2-google: one package per provider |
+| omnibridge/symfony, omnibridge/laravel | an authenticator per firewall; a guard and a user provider |
 
 The name: OmniAuth is also Ruby's well-known sign-in library. This one is PHP, under `omniscient/`,
 and unrelated.
