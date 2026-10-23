@@ -1,8 +1,8 @@
 {
     "name": "omniscient/omniauth",
     "type": "library",
-    "description": "Omniauth: who signs in, and by which factors, under any PHP host - the contracts (accounts, the stores of each proof, the second-factor rule, the host's small duties), the conductor (begin, then verify; the attempt, the result), the methods that need no library (password through symfony/password-hasher, sign-in link, code by e-mail, backup codes, trusted devices in scheb/2fa's cookie format), PSR-14 events and Testing helpers. Passkeys, TOTP and OAuth are packages of their own; the Symfony and Laravel bridges live in omnibridge.",
-    "keywords": ["authentication", "sign-in", "two-factor", "2fa", "password", "magic-link", "backup-codes", "trusted-device", "framework-agnostic", "omniauth"],
+    "description": "Omniauth: who signs in, and by which factors, under any PHP host - the contracts (accounts, the stores of each proof, the second-factor rule, the host's small duties), the conductor (begin, then verify; the attempt, the result), the methods that need no library (password through symfony/password-hasher, sign-in link, code by e-mail, backup codes, trusted devices in scheb/2fa's cookie format), the sign-in through identity providers (Omniauth\\OAuth\\: state, PKCE and nonce, the linking by the provider's subject, the sign-up of an unknown identity; each provider a package of its own, omniauth/google first), PSR-14 events and Testing helpers. WebAuthn (passkeys) and one-time passwords (TOTP) are packages of their own; the Symfony and Laravel bridges live in omnibridge.",
+    "keywords": ["authentication", "sign-in", "two-factor", "2fa", "password", "magic-link", "backup-codes", "trusted-device", "oauth", "oauth2", "openid-connect", "pkce", "framework-agnostic", "omniauth"],
     "homepage": "https://github.com/glitchr-studio/omniauth",
     "license": "MIT",
     "authors": [
@@ -20,10 +20,15 @@
         "symfony/password-hasher": "^6.4|^7.0|^8.0"
     },
     "require-dev": {
+        "league/oauth2-client": "^2.7",
         "phpunit/phpunit": "^11.0",
         "symfony/cache": "^6.4|^7.0|^8.0"
     },
     "suggest": {
+        "league/oauth2-client": "Omniauth\\OAuth\\Provider\\LeagueProvider, the ground of the provider packages built on league (omniauth/google requires it): any league/oauth2-client provider as an omniauth Provider",
+        "omniauth/google": "Google sign-in (over league/oauth2-google): its GoogleProvider and the GoogleFactory of Omniauth\\OAuth\\Provider\\Providers::configured()",
+        "omniauth/otp": "Authenticator applications (TOTP) over spomky-labs/otphp, and their secrets sealed at rest with sodium (formerly omniauth/totp)",
+        "omniauth/webauthn": "Passkeys over web-auth/webauthn-lib (formerly omniauth/passkey)",
         "omniscient/omnibridge": "The host contracts: Omnibridge\\Contract\\Tokens checks a sign-in form's CSRF token; omnibridge/symfony and omnibridge/laravel bridge omniauth to their host",
         "symfony/cache": "A PSR-6 pool or PSR-16 cache for Omniauth\\CacheThrottle in plain PHP"
     },

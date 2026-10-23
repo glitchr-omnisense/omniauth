@@ -4,13 +4,35 @@ namespace Omniauth\Tests;
 
 use PHPUnit\Framework\TestCase;
 
-/** docs/installation.md's PHP block, run as it is written (its autoloader the one of this run). */
+/** The PHP blocks of docs/installation.md and docs/oauth.md, run as they are written (their autoloader the one of this run). */
 final class DocsTest extends TestCase
 {
     public function testTheInstallationPageRunsAsWritten(): void
     {
-        $page = (string) file_get_contents(__DIR__.'/../docs/installation.md');
-        self::assertSame(1, preg_match('~```php\n(.*?)```~s', $page, $block));
+        [$block, $out] = self::runPage('installation.md');
+
+        self::assertSame("second-factor-required: email-code\nauthenticated as ringo by password + email-code\ntrusted_device cookie to set\n", $out);
+        foreach (['second-factor-required: email-code', 'authenticated as ringo by password + email-code'] as $line) {
+            self::assertStringContainsString("\n// $line\n", $block, 'the page says what it prints');
+        }
+    }
+
+    public function testTheIdentityProvidersPageRunsAsWritten(): void
+    {
+        [$block, $out] = self::runPage('oauth.md');
+
+        $lines = ['authenticated as ringo, linked to google 108204', 'identity-unknown: john@example.org'];
+        self::assertSame(implode("\n", $lines)."\n", $out);
+        foreach ($lines as $line) {
+            self::assertStringContainsString("\n// $line\n", $block, 'the page says what it prints');
+        }
+    }
+
+    /** @return array{string, string} the page's first PHP block and what it printed */
+    private static function runPage(string $page): array
+    {
+        $text = (string) file_get_contents(__DIR__.'/../docs/'.$page);
+        self::assertSame(1, preg_match('~```php\n(.*?)```~s', $text, $block));
         $autoload = \dirname((string) (new \ReflectionClass(\Composer\Autoload\ClassLoader::class))->getFileName(), 2).'/autoload.php';
         $code = str_replace("require 'vendor/autoload.php';", 'require '.var_export($autoload, true).';', $block[1], $replaced);
         self::assertSame(1, $replaced);
@@ -25,9 +47,6 @@ final class DocsTest extends TestCase
             unlink($script);
         }
 
-        self::assertSame("second-factor-required: email-code\nauthenticated as ringo by password + email-code\ntrusted_device cookie to set\n", $out);
-        foreach (['second-factor-required: email-code', 'authenticated as ringo by password + email-code'] as $line) {
-            self::assertStringContainsString("\n// $line\n", $block[1], 'the page says what it prints');
-        }
+        return [$block[1], $out];
     }
 }

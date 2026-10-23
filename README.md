@@ -34,16 +34,18 @@ $result = $omniauth->verify('email-code', $context, ['code' => '481516', 'trust'
 ```
 
 It requires PHP 8.2, four PSR interfaces (cache, simple-cache, clock, event-dispatcher) and
-`symfony/password-hasher`, a standalone component. The methods that carry a library are packages
-of their own; the hosts are bridged in omnibridge:
+`symfony/password-hasher`, a standalone component. The sign-in through identity providers is here
+too (`Omniauth\OAuth\`), with no OAuth library: each provider is a package of its own, as
+omnishield has one per captcha. The methods that carry a library are packages of their own; the
+hosts are bridged in omnibridge:
 
 | Package | What |
 |---|---|
-| `omniscient/omniauth` (here) | the contracts, the conductor, the methods that need no library: password, sign-in link, code by e-mail, backup codes, trusted devices; events; `Testing\` |
-| [`omniauth/passkey`](https://github.com/glitchr-studio/omniauth-passkey) | passkeys, over web-auth/webauthn-lib; compatible both ways with web-auth/webauthn-symfony-bundle's records |
-| [`omniauth/totp`](https://github.com/glitchr-studio/omniauth-totp) | authenticator applications, over spomky-labs/otphp, on scheb/2fa's parameters; a code once |
-| [`omniauth/oauth`](https://github.com/glitchr-studio/omniauth-oauth) | sign-in through identity providers, with no OAuth library: the state, PKCE and nonce, the linking by `sub`, the sign-up of an unknown identity |
+| `omniscient/omniauth` (here) | the contracts, the conductor, the methods that need no library: password, sign-in link, code by e-mail, backup codes, trusted devices; the sign-in through identity providers (`Omniauth\OAuth\`: the state, PKCE and nonce, the linking by `sub`, the sign-up of an unknown identity; `LeagueProvider` for any league/oauth2-client provider, league suggested); events; `Testing\` |
+| [`omniauth/webauthn`](https://github.com/glitchr-studio/omniauth-webauthn) | passkeys, over web-auth/webauthn-lib; compatible both ways with web-auth/webauthn-symfony-bundle's records (formerly omniauth/passkey) |
+| [`omniauth/otp`](https://github.com/glitchr-studio/omniauth-otp) | authenticator applications (TOTP), over spomky-labs/otphp, on scheb/2fa's parameters; a code once; the secrets sealed at rest with sodium (formerly omniauth/totp) |
 | [`omniauth/google`](https://github.com/glitchr-studio/omniauth-google) | Google, over league/oauth2-google: one package per provider |
+| omniauth/oauth | **abandoned**: its mechanics are this package's `Omniauth\OAuth\` since 2026-10-23 (same namespace, same class names); its last release is empty and requires this one |
 | omnibridge/symfony, omnibridge/laravel | an authenticator per firewall; a guard and a user provider |
 
 The name: OmniAuth is also Ruby's well-known sign-in library. This one is PHP, under `omniscient/`,
@@ -58,6 +60,7 @@ and unrelated.
 | `Contract\` | `Accounts`; one store per proof (`Passwords`, `LinkTokens`, `EmailCodes`, `BackupCodes`, `TrustedVersion`, `TotpSecrets`, `Identities`); `SecondFactorPolicy`; the host's duties (`State`, `Throttle`, `Sender`) |
 | `Method\` | `Method` (verify), `Challenging` (begin first), `SecondFactor` (enrolled?), `Ambient` (read from the context), `Enrolling`, `Revocable`; `Verdict`, `Challenge`, `Methods` |
 | `Password\`, `Link\`, `EmailCode\`, `BackupCode\`, `TrustedDevice\` | the five methods of the core |
+| `OAuth\` | `OAuthMethod` (a first factor: the trip out and back, the linking rule, `adopt()`), `Authorization`, `Identity`, `Provider\{Provider, ProviderFactory, Providers, LeagueProvider}`, `NoSecondFactorLinking`, `Testing\FakeProvider` |
 | `EnrolledSecondFactors`, `ArrayState`, `CacheThrottle`, `SystemClock` | the defaults: the rule, the state, the throttle, the clock |
 | `Event\` | PSR-14: `Beginning`, `Verifying`, `SecondFactorRequired`, `SignedIn`, `SignInFailed`, `AccountRefused`, `Revoking`, `CredentialAdded`, `CredentialRemoved` |
 | `Testing\` | in-memory stores, a recording sender, a fixed clock, an array cache, stand-ins for a passkey and an authenticator application |
@@ -76,7 +79,8 @@ and unrelated.
 - [Installation, in plain PHP](docs/installation.md)
 - [The contracts](docs/contracts.md)
 - [Password](docs/password.md), [sign-in link](docs/link.md), [code by e-mail](docs/email-code.md),
-  [backup codes](docs/backup-codes.md), [trusted devices](docs/trusted-devices.md)
+  [backup codes](docs/backup-codes.md), [trusted devices](docs/trusted-devices.md),
+  [identity providers](docs/oauth.md)
 - [The second-factor rule](docs/second-factor.md)
 - [Events](docs/events.md)
 - [Testing](docs/testing.md)
@@ -93,9 +97,12 @@ and unrelated.
   writes for the same input, whole seconds and microseconds, each read by the other (recorded, and
   live with scheb/2fa installed in the harness); hashes written by symfony/password-hasher 8.1
   ("auto": bcrypt, cost 13), one of a 102-byte password that `password_verify()` alone refuses;
-  `docs/installation.md` run as written; in plain PHP, a whole sign-in by hand loading nothing but
-  omniauth, the PSR interfaces and symfony/password-hasher, and every class of the package loading
-  with them alone (`BareTest`).
+  `docs/installation.md` and `docs/oauth.md` run as written; in plain PHP, a whole sign-in by hand
+  loading nothing but omniauth, the PSR interfaces and symfony/password-hasher, a sign-in through a
+  fake identity provider loading no OAuth library, and every class of the package loading with them
+  alone, `LeagueProvider` included (`BareTest`); the identity providers' trip (state, PKCE, nonce,
+  forged and injected returns, the linking rule, a return path on the host of each trip) on the fake
+  provider, and `LeagueProvider` over a generic league provider with recorded answers.
 - Not verified: an application's own stores (omnibase fills them at step AU4); a real host (the
   bridges come with AU6 and AU8); a cookie written by a running scheb/2fa on an application (the
   encoder is compared, not a browser's cookie); concurrent tries against `CacheThrottle` (read then

@@ -14,11 +14,14 @@ use PHPUnit\Framework\TestCase;
  * the PSR interfaces it requires and symfony/password-hasher (a standalone
  * component): no class of a framework, an ORM, a template engine, scheb/2fa
  * or an application - even in the harness, where scheb/2fa and Symfony's
- * bundles are installed beside it.
+ * bundles are installed beside it. The sign-in through an identity provider
+ * (Omniauth\OAuth\, formerly omniauth/oauth) by hand too, on the fake
+ * provider: no OAuth library loaded - league/oauth2-client is the provider
+ * packages' (omniauth/google), only suggested here.
  */
 final class BareTest extends TestCase
 {
-    private const FOREIGN = '~^(?:Symfony\\\\(?!Component\\\\PasswordHasher\\\\|Polyfill\\\\)|(?:Illuminate|Laravel|Doctrine|Twig|Scheb|Lcobucci|OTPHP|Webauthn|League|Omnibridge|Base|App)\\\\)~';
+    private const FOREIGN = '~^(?:Symfony\\\\(?!Component\\\\PasswordHasher\\\\|Polyfill\\\\)|Omniauth\\\\(?:WebAuthn|Otp|Passkey|Totp|Google)\\\\|(?:Illuminate|Laravel|Doctrine|Twig|Scheb|Lcobucci|OTPHP|Webauthn|League|GuzzleHttp|Omnibridge|Base|App)\\\\)~';
     private const ALLOWED_FILES = '~/vendor/(?:psr/(?:cache|clock|event-dispatcher|simple-cache)|symfony/password-hasher|composer)/|/vendor/autoload\.php$~';
 
     public function testASignInByHandLoadsNothingButOmniauthThePsrInterfacesAndThePasswordHasher(): void
@@ -41,13 +44,36 @@ final class BareTest extends TestCase
         self::assertSame([], self::outside($report['loaded']['files'], $report['loaded']['eager']), 'no file but the package, the PSR interfaces and the password hasher');
     }
 
+    public function testAnOAuthSignInByHandLoadsNoOAuthLibrary(): void
+    {
+        $report = self::php([__DIR__.'/OAuth/Fixtures/bare.php', self::autoload()]);
+
+        self::assertSame(['authenticated', 'ringo', ['oauth']], [$report['linked']['status'], $report['linked']['account'], $report['linked']['passed']], 'a verified address links');
+        self::assertSame(['google' => '108204'], $report['identities']);
+        self::assertSame(['authenticated', 'ringo'], [$report['by-subject']['status'], $report['by-subject']['account']], 'then the subject alone');
+        self::assertSame(['identity-unknown', null, ['9001', 'john@example.org', true]], [$report['unknown']['status'], $report['unknown']['account'], $report['unknown']['identity']], 'no account made');
+        self::assertSame('identity-unknown', $report['unverified']['status'], 'an unverified address finds no account');
+        self::assertSame(['failed', 'bad-credentials', 'state-mismatch'], [$report['forged']['status'], $report['forged']['failure'], $report['forged']['reason']]);
+        self::assertSame(['failed', 'bad-credentials', 'exchange-failed'], [$report['injected']['status'], $report['injected']['failure'], $report['injected']['reason']], 'PKCE');
+        self::assertSame(['failed', 'not-enrolled', 'link-from-settings'], [$report['by-address-with-a-second-factor']['status'], $report['by-address-with-a-second-factor']['failure'], $report['by-address-with-a-second-factor']['reason']], 'QA3');
+        self::assertSame(['second-factor-required', ['oauth'], ['email-code']], [$report['second-factor']['status'], $report['second-factor']['passed'], $report['second-factor']['offered']], 'QA2');
+        self::assertSame(['authenticated', ['oauth', 'email-code']], [$report['then-the-code']['status'], $report['then-the-code']['passed']]);
+
+        self::assertContains('Omniauth\OAuth\OAuthMethod', $report['loaded']['symbols']);
+        self::assertSame([], self::foreign($report['loaded']['symbols']), 'no OAuth library, no framework');
+        self::assertSame([], self::outside($report['loaded']['files'], $report['loaded']['eager']));
+    }
+
     public function testEveryClassLoadsWithTheRequiredPackagesAlone(): void
     {
         $report = self::php([__DIR__.'/Fixtures/load-all.php', self::autoload(), \dirname(__DIR__)]);
 
-        self::assertGreaterThan(60, \count($report['loaded']));
+        self::assertGreaterThan(70, \count($report['loaded']));
         self::assertContains('Omniauth\Testing\InMemoryStore', $report['loaded']);
         self::assertContains('Omniauth\TrustedDevice\TrustedDevices', $report['loaded']);
+        foreach (['OAuthMethod', 'Provider\Providers', 'Provider\ProviderFactory', 'Provider\LeagueProvider', 'Testing\FakeProvider', 'NoSecondFactorLinking'] as $class) {
+            self::assertContains('Omniauth\OAuth\\'.$class, $report['loaded'], 'loaded without league/oauth2-client');
+        }
         self::assertSame([], self::foreign($report['symbols']));
         self::assertSame([], self::outside($report['files'], $report['eager']));
     }

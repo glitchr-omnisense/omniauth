@@ -11,4 +11,6 @@ parameters:
     excludePaths:
         - vendor
         - docker
+        # The former name of omniauth/google's class, an alias for one release.
+        - OAuth/Provider/GoogleProvider.php
     reportUnmatchedIgnoredErrors: false

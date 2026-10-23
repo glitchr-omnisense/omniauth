@@ -13,11 +13,11 @@ enum Factor: string
     case Password = 'password';
     /** The mailbox: a link sent to the account's address. */
     case Link = 'link';
-    /** The device and the gesture or the code that unlocks it (omniauth/passkey). */
+    /** The device and the gesture or the code that unlocks it (omniauth/webauthn). */
     case Passkey = 'passkey';
-    /** An identity provider (omniauth/oauth). */
+    /** An identity provider (Omniauth\OAuth\OAuthMethod). */
     case OAuth = 'oauth';
-    /** The authenticator application (omniauth/totp). */
+    /** The authenticator application (omniauth/otp). */
     case Totp = 'totp';
     /** A code sent to the account's address once a first factor passed. */
     case EmailCode = 'email-code';

@@ -1,6 +1,6 @@
 ---
 title: The second-factor rule
-order: 8
+order: 9
 ---
 
 # The second-factor rule

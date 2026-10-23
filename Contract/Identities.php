@@ -4,7 +4,7 @@ namespace Omniauth\Contract;
 
 /**
  * The accounts linked to an identity provider, by the person's identifier
- * there ("sub"); read by omniauth/oauth (omnibase: the userIdentity table).
+ * there ("sub"); read by Omniauth\OAuth\OAuthMethod (omnibase: the userIdentity table).
  * One subject of a provider has one account; an account has one identity per
  * provider.
  */

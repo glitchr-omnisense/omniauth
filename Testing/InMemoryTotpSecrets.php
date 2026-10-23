@@ -4,7 +4,7 @@ namespace Omniauth\Testing;
 
 use Omniauth\Contract\TotpSecrets;
 
-/** The TOTP secrets on TestAccount objects (InMemoryStore::totpSecrets()), for omniauth/totp's tests. */
+/** The TOTP secrets on TestAccount objects (InMemoryStore::totpSecrets()), for omniauth/otp's tests. */
 final class InMemoryTotpSecrets implements TotpSecrets
 {
     public function secret(object $account): ?string

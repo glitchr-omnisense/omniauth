@@ -6,7 +6,8 @@
  * one, from GitHub (branch 1.x) otherwise; every package's tests in one run.
  * scheb/2fa is a development dependency here only: the trusted-device tests
  * compare omniauth's tokens with its JwtTokenEncoder's, omniauth/totp's its
- * TOTP codes; a method package adds its own (plugins.php). Files are rewritten
+ * TOTP codes; league/oauth2-client for the core's LeagueProvider tests (omniauth
+ * only suggests it); a method package adds its own (plugins.php). Files are rewritten
  * only when they change, so the entrypoint knows when to install.
  */
 $plugins = require __DIR__.'/plugins.php';
@@ -49,6 +50,7 @@ $composer = [
     'repositories' => $repositories,
     'require' => $require + ['php' => '>=8.2'],
     'require-dev' => [
+        'league/oauth2-client' => '^2.7',
         'phpunit/phpunit' => '^11.0',
         'scheb/2fa' => '^8.0',
         'symfony/cache' => '^6.4|^7.0|^8.0',

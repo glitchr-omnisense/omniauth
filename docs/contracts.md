@@ -32,8 +32,8 @@ One store per proof, so a site takes only what it serves:
 | `EmailCodes` | on or off, the code's keyed hash | `user.emailAuthEnabled`, `user.emailAuthCode` |
 | `BackupCodes` | the codes' `password_hash()` hashes | `user.backupCodes` |
 | `TrustedVersion` | the trusted devices' version; `revokeAll()` raises it | `user.trustedTokenVersion` |
-| `TotpSecrets` | the base32 secret (read by omniauth/totp) | `user.secret` |
-| `Identities` | provider + the person's identifier there (read by omniauth/oauth) | `userIdentity` (AU5) |
+| `TotpSecrets` | the base32 secret (read by omniauth/otp; sealed at rest by its SealedTotpSecrets) | `user.secret` |
+| `Identities` | provider + the person's identifier there (read by `Omniauth\OAuth\OAuthMethod`) | `userIdentity` (AU5) |
 
 No table, no ORM here: the structure stays the application's, described once, read by every host.
 
