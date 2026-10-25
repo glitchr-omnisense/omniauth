@@ -1,19 +1,35 @@
 ---
 title: Installation
-order: 1
+order: 10
 ---
 
-# Installation, in plain PHP
+## Installation
 
 ```sh
-composer require omniscient/omniauth
+composer require omniscient/omniauth                       # password, link, code by e-mail, backup codes, trusted devices, identity providers
+composer require omniauth/otp omniauth/webauthn omniauth/google   # an authenticator application, passkeys, Google: one package each
 ```
 
-It requires PHP 8.2, four PSR interfaces (cache, simple-cache, clock, event-dispatcher) and
-`symfony/password-hasher`, a standalone component. No framework, no ORM: the accounts and their
-proofs stay in your tables, behind small store contracts ([contracts](contracts.md)).
+### Requirements
 
-The whole thing by hand - the in-memory stores of `Omniauth\Testing` stand in for yours:
+- PHP 8.2 or later.
+- `omniscient/omniauth` requires `psr/cache` (^2.0 or ^3.0), `psr/simple-cache` (^2.0 or ^3.0),
+  `psr/clock` (^1.0), `psr/event-dispatcher` (^1.0) and `symfony/password-hasher` (^6.4, ^7.0 or
+  ^8.0), a component that loads no framework. Nothing else: no ORM, no HTTP client, no OAuth
+  library.
+- It suggests `league/oauth2-client` (`Omniauth\OAuth\Provider\LeagueProvider`: the provider
+  packages require it), `symfony/cache` (a PSR-6 pool or PSR-16 cache for `CacheThrottle` in plain
+  PHP), `phpunit/phpunit` (the providers' conformance suite) and `omniscient/omnibridge` (the hosts'
+  contracts, among them `Omnibridge\Contract\Tokens` for a form's CSRF token).
+- `omniauth/otp` adds `ext-sodium`, spomky-labs/otphp and paragonie/constant_time_encoding;
+  `omniauth/webauthn` adds `ext-openssl`, web-auth/webauthn-lib, symfony/serializer and symfony/uid;
+  `omniauth/google` adds league/oauth2-client and league/oauth2-google (Guzzle through them).
+
+### Plain PHP
+
+No framework, no ORM: the accounts and their proofs stay in your tables, behind small store
+contracts ([The contracts](contracts.md)). The whole thing by hand - the in-memory stores of
+`Omniauth\Testing` stand in for yours:
 
 ```php
 <?php
@@ -85,7 +101,38 @@ Check your form's CSRF token before calling (`Omnibridge\Contract\Tokens` under 
 `docker/harness/bin/bare` is a whole script of the same, every method in turn; `Tests/DocsTest`
 runs the block above as it is written here.
 
-Next: [the contracts](contracts.md), then a page per method - [password](password.md),
-[link](link.md), [code by e-mail](email-code.md), [backup codes](backup-codes.md),
-[trusted devices](trusted-devices.md) - [the second-factor rule](second-factor.md),
-[events](events.md), [testing](testing.md), [Symfony and Laravel](hosts.md).
+Run in the [harness](harness.md) on 2026-10-25 (PHP 8.4), the script prints:
+
+```
+second-factor-required: email-code
+authenticated as ringo by password + email-code
+trusted_device cookie to set
+```
+
+The pieces:
+
+- the **methods**, one per factor, each over the stores it reads (`PasswordMethod` over
+  `Passwords`, `EmailCodeMethod` over `EmailCodes` and a `Sender`...), mounted in a
+  `Method\Methods`;
+- the **conductor**, `Omniauth`, over the accounts, the methods, the visitor's `State` (here an
+  array; the session under a framework) and optionally a `Throttle`, a PSR-14 dispatcher, a
+  PSR-20 clock and a second-factor rule (by default `EnrolledSecondFactors`);
+- a **`Context`** per request (origin, host, address, browser, the `trusted_device` cookie, the
+  firewall's name) and the **proof** the visitor sent, as an array.
+
+The same script with Google in place of the password is the [identity providers](oauth.md)
+page's; with an authenticator application, omniauth/otp's installation page; with a passkey,
+omniauth/webauthn's.
+
+### In a framework
+
+- **Symfony**: omnibridge/symfony's `OmnibridgeBundle` registers omniauth's extension where
+  omniauth is installed; `config/packages/omniauth.yaml` turns each method on, and one
+  authenticator, `Omnibridge\Symfony\Auth\OmniauthAuthenticator`, signs in by all of them:
+  [Symfony](symfony.md).
+- **Laravel**: omnibridge/laravel's `Auth\AuthServiceProvider`, on with `config/omnibridge.php`'s
+  `'auth' => true`; `config/omniauth.php` takes the same keys as `omniauth.yaml`, and the guard
+  driver `omniauth` signs in: [Laravel](laravel.md).
+- **Any other host**: build the conductor once per request (or once per worker, with a `State`
+  that reads the current request's session), as the script above does, and answer its `Result`
+  as described above.

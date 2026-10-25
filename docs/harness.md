@@ -1,9 +1,9 @@
 ---
 title: The Docker harness
-order: 13
+order: 70
 ---
 
-# The Docker harness
+## The Docker harness
 
 `docker/` runs this package with every `omniauth/*` method package - from GitHub (branch 1.x), or
 from the checkouts beside this one when `OMNIAUTH_PLUGINS=../..` is set in `docker/.env` - on PHP
@@ -26,3 +26,23 @@ a link, then the same link again; a password of 102 bytes hashed by Symfony; six
 `Tests/BareTest` runs it, and loads every class of the package, in PHP processes of their own, and
 checks that nothing is loaded but omniauth, the PSR interfaces and symfony/password-hasher - not a
 class of a framework, of scheb/2fa or of an application, though the harness has them installed.
+
+### Running a script of your own
+
+The entrypoint also runs `php`, `composer` and `sh` as they are; the harness's autoloader is
+`/harness/vendor/autoload.php`. The examples of this manual were run so, a scratch directory
+mounted read-only:
+
+```sh
+docker compose run --rm -v "$PWD/scratch:/scratch:ro" omniauth php /scratch/example.php
+```
+
+On 2026-10-25 (PHP 8.4.26, PHPUnit 11.5.57, the four packages from their checkouts), `test` ran
+235 tests, 2490 assertions, green, one skipped; `bare` printed each attempt's result as JSON
+(`password`: authenticated as ringo; `two-steps`: second-factor-required with `email-code` and
+`backup-code` offered, then authenticated by `password` + `email-code` with a trusted device,
+then by `password` + `trusted-device`).
+
+The harness's Composer project lives in the volume `omniauth-harness_harness`: `docker compose
+down -v` removes it, and the next run installs again (over the network: the method packages that
+have no checkout under `OMNIAUTH_PLUGINS` come from GitHub).

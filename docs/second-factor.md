@@ -1,9 +1,9 @@
 ---
 title: The second-factor rule
-order: 9
+order: 37
 ---
 
-# The second-factor rule
+## The second-factor rule
 
 ```php
 interface SecondFactorPolicy
@@ -30,3 +30,30 @@ A host changes the list (`new EnrolledSecondFactors($methods, [...])`) or writes
 omnibase decorates this one with its `SecurityPolicy` (a role that requires a second factor and has
 none is sent to enrol; the demo account never is). Refusing to turn a factor off ("the
 administrator wins") is a listener of `Event\Revoking`.
+
+### How the default rule decides
+
+`EnrolledSecondFactors::required($account, $passed, $context)`, with `$after` the list above:
+
+1. none of the factors passed is in `$after` (a passkey alone, say): nothing is due;
+2. a second factor was passed already (a trusted device, read by the conductor on the way): nothing
+   is due;
+3. the second factors mounted that the account set up (`Method\SecondFactor::enrolled()`; the
+   ambient trusted device is not one) are listed in the order the methods were mounted; without
+   any but backup codes, nothing is due;
+4. otherwise those factors are due, any one of them, and backup codes last when the account has
+   some.
+
+```php
+use Omniauth\EnrolledSecondFactors;
+use Omniauth\Factor;
+
+// A second factor after a passkey too: QA1 undone for this host.
+$policy = new EnrolledSecondFactors($methods, [Factor::Password, Factor::Link, Factor::OAuth, Factor::Passkey]);
+$omniauth = new Omniauth($accounts, $methods, $state, policy: $policy);
+```
+
+The conductor builds `new EnrolledSecondFactors($methods)` when no policy is given. A policy of the
+host's own receives the account, the factors passed and the `Context` (the host can ask more of a
+visitor from an unknown network, say) and returns the factors still due; an empty list ends the
+sign-in.

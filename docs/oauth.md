@@ -1,10 +1,9 @@
 ---
 title: Identity providers (OAuth 2, OpenID Connect)
-order: 8
+order: 36
 ---
 
-# Identity providers (OAuth 2, OpenID Connect)
-
+## Identity providers (OAuth 2, OpenID Connect)
 
 ```sh
 composer require omniscient/omniauth omniauth/google
@@ -73,8 +72,7 @@ with `$result->reason` translated.
 
 Next: the method and its linking rule, then the providers, below.
 
-## The method
-
+### The method
 
 `OAuthMethod` is a first factor (`Factor::OAuth`), `Challenging` and `Enrolling`:
 
@@ -83,16 +81,19 @@ new OAuthMethod(
     accounts: $accounts,          // Omniauth\Contract\Accounts
     identities: $identities,      // Omniauth\Contract\Identities: provider + sub -> account
     providers: new Providers(new GoogleProvider($id, $secret, '/login/google/callback')),   // omniauth/google
-    byEmail: new NoSecondFactorLinking($methods),   // true (any account), false (never), or a rule
+    byEmail: new NoSecondFactorLinking($methods),   // true (any account, the default), false (never), or a rule
+    clock: null,                  // PSR-20: Identities::used()'s date; null: SystemClock
 );
 ```
+
+`providers()` gives the `Providers` it serves (what the sign-in page lists: `names()`).
 
 ### The trip
 
 | | |
 |---|---|
-| `begin()` (`['provider' => 'google']`, or nothing when one provider is served) | draws a state, a PKCE verifier and a nonce (32 random bytes each, base64url), keeps them in the attempt with the provider's name, answers `Challenge::redirect()` with the authorization address: the state, the S256 challenge, the nonce, the return address and scopes; it keeps the origin of the request too (`Context::$origin`), on which a return path (`/login/google/callback`) is completed - here and again at the exchange. The verifier never leaves the server. |
-| `verify()` (the return's query: `code`, `state`, or `error`) | takes what the attempt kept - **once**: a return replayed finds nothing, `expired` -, compares the state in constant time **before anything else** (a return this visitor did not begin is not read further: no exchange, no request), then has the provider exchange the code **with the verifier** and read the person. |
+| `begin()` (`['provider' => 'google']`, or nothing when one provider is served) | draws a state, a PKCE verifier and a nonce (32 random bytes each, base64url), keeps them in the attempt with the provider's name, answers `Challenge::redirect()` with the provider's authorization address: the state, the S256 challenge, the return address and scopes, and the nonce for an OpenID Connect provider (omniauth/google's, `FakeProvider`; a plain `LeagueProvider` does not send it); an unknown provider, or none named when several are served, is `bad-credentials` / `unknown-provider`; it keeps the origin of the request too (`Context::$origin`), on which a return path (`/login/google/callback`) is completed - here and again at the exchange. The verifier never leaves the server. |
+| `verify()` (the return's query: `code`, `state`, or `error`) | takes what the attempt kept - **once**: a return replayed finds nothing, `expired` -, refuses a return whose `provider` (the route's) is not the trip's (`state-mismatch`), compares the state in constant time **before anything else** (a return this visitor did not begin is not read further: no exchange, no request), then reads `error` (`access_denied`: `provider-denied`; any other: `provider-error`) and `code` (none: `missing-code`), then has the provider exchange the code **with the verifier** and read the person; a `ProviderError` becomes `bad-credentials` with its reason. A provider that vouches for an identity of another provider's name is a programming error (`LogicException`). |
 
 The state stops a return the visitor did not begin (login CSRF: an attacker's own code landed in
 the victim's browser). PKCE stops a code used in a trip it was not issued for (a code stolen from
@@ -163,8 +164,7 @@ method's clock). Turning a link off is the store's `Identities::unlink($account,
 the host's settings page calls; omnibase's store is `Base\Auth\UserIdentities` on its
 `userIdentity` table.
 
-## The providers
-
+### The providers
 
 A provider (`Provider\Provider`) gives the authorization address for an `Authorization` (state,
 verifier, nonce, the origin the trip began at) and, for the code that came back, the `Identity` it
@@ -215,6 +215,47 @@ required by omniauth - the provider packages require it -, so the class loads wi
 usable only with it. PKCE is omniauth's: leave the league provider's `pkceMethod` unset.
 (`Omniauth\Google\LeagueProvider` is an alias of it for one release.)
 
+```php
+use League\OAuth2\Client\Provider\GenericProvider;
+use Omniauth\OAuth\Provider\LeagueProvider;
+
+$forge = new LeagueProvider(
+    name: 'forge',                                   // the provider's key: the routes' {provider}, Identities' $provider
+    league: new GenericProvider([
+        'clientId' => $id, 'clientSecret' => $secret,
+        'urlAuthorize' => 'https://forge.example/oauth/authorize',
+        'urlAccessToken' => 'https://forge.example/oauth/token',
+        'urlResourceOwnerDetails' => 'https://forge.example/api/user',
+    ]),
+    scopes: ['read:user'],                           // [] : the league provider's defaults
+    fields: ['subject' => 'id', 'email' => 'email', 'verified' => 'email_verified', 'name' => 'name'],
+    redirectUri: '/login/forge/callback',            // null: the league provider's own redirectUri
+);
+```
+
+For a trip begun at `https://example.org`, its authorization address (run in the
+[harness](harness.md) on 2026-10-25, no network: building the address calls nothing) is
+`forge.example/oauth/authorize` with `state`, `code_challenge`, `code_challenge_method`, `scope`
+(`read:user`), `redirect_uri` (`https://example.org/login/forge/callback`) and league's own
+`response_type`, `approval_prompt` and `client_id`.
+
+| Argument | Type | Default | |
+|---|---|---|---|
+| `name` | `string` | - | the provider's key |
+| `league` | `League\OAuth2\Client\Provider\AbstractProvider` | - | the league provider; `league()` gives it back |
+| `scopes` | `list<string>` | `[]` | sent as `scope`; empty: the league provider's own |
+| `fields` | `array<string, ?string>` | `LeagueProvider::FIELDS`: `subject` null (the resource owner's `getId()`), `email` `email`, `verified` null, `name` `name` | the details' keys; `verified` null means the provider says nothing, so no address is ever said verified and no account is linked by it |
+| `redirectUri` | `?string` | `null` | each trip's return address, absolute or a path, sent in the address and again at the exchange |
+
+What it does: the address is league's `getAuthorizationUrl()` with `state`, `code_challenge`,
+`code_challenge_method=S256`, `scope` and `redirect_uri` (a league provider that drew a PKCE code
+of its own is refused with a `LogicException`); the exchange is `getAccessToken('authorization_code',
+code, code_verifier, redirect_uri)`, any exception there a `ProviderError` `exchange-failed`; the
+person is `getResourceOwner()`'s `toArray()` (a failure `exchange-failed`, league/oauth2-google's
+`HostedDomainException` `hosted-domain`), a subject missing or empty `no-subject`. The `Identity`
+keeps every detail in `claims`. A subclass overrides `authorizationOptions()`, `identity()`,
+`details()` or `fromClaims()` (omniauth/google adds the nonce and reads the ID token).
+
 ### In tests
 
 `Testing\FakeProvider` is an authorization server in memory: `consent($authorizationUrl, $person)`
@@ -222,6 +263,24 @@ gives the return's `code` and `state`, `deny()` an `access_denied`; `identify()`
 once, only with the verifier whose challenge the address carried and for the return address it was
 given to, and checks the nonce. Its return address may be a path too. Under it a host's tests sign
 in with no network, and a forged or injected return fails as it would at Google.
+
+```php
+new FakeProvider(
+    name: 'google',
+    redirectUri: 'https://example.org/login/google/callback',   // or a path
+    clientId: 'omniauth-test-client',
+    scopes: ['openid', 'email', 'profile'],
+);
+```
+
+Its address is `FakeProvider::AUTHORIZE` (`https://provider.test/authorize`) with the client, the
+return address, `response_type=code`, the scopes, the state, the S256 challenge and the nonce.
+`consent()` takes an `Identity` or an array (`sub`, `email`, `email_verified`, `name`) and refuses
+an address not of its client and return address, or without its challenge
+(`InvalidArgumentException`); `returnUrl($return)` gives the address the browser lands on;
+`$exchanges` lists every exchange asked (code and verifier). A code unknown or used, a verifier
+that is not the challenge's, a return address that is not the authorization's are `ProviderError`
+`exchange-failed`; a nonce that is not the trip's `invalid-id-token`.
 
 ### Conformance suite
 

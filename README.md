@@ -76,16 +76,19 @@ and unrelated.
 
 ## Documentation
 
-- [Installation, in plain PHP](docs/installation.md)
-- [The contracts](docs/contracts.md)
+The manual, in `docs/` (one page on the site, in this order):
+
+- [Overview](docs/index.md): the methods and the identity providers
+- [Installation](docs/installation.md): requirements, a whole sign-in in plain PHP
+- [Symfony and Laravel](docs/hosts.md), [Symfony](docs/symfony.md), [Laravel](docs/laravel.md)
+- [Concepts](docs/concepts.md), [The contracts](docs/contracts.md)
 - [Password](docs/password.md), [sign-in link](docs/link.md), [code by e-mail](docs/email-code.md),
   [backup codes](docs/backup-codes.md), [trusted devices](docs/trusted-devices.md),
   [identity providers](docs/oauth.md)
-- [The second-factor rule](docs/second-factor.md)
-- [Events](docs/events.md)
-- [Testing](docs/testing.md)
-- [Symfony and Laravel](docs/hosts.md)
-- [The Docker harness](docs/harness.md)
+- [The second-factor rule](docs/second-factor.md), [Events](docs/events.md)
+- [Configuration reference](docs/configuration.md), [Errors](docs/errors.md)
+- [Testing](docs/testing.md), [The Docker harness](docs/harness.md)
+- [Writing a method or a provider](docs/providers.md), [Verified, and not](docs/verified.md)
 
 ## Verified, and not
 
