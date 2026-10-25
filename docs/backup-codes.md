@@ -3,7 +3,7 @@ title: Backup codes
 order: 34
 ---
 
-## Backup codes
+# Backup codes
 
 ```php
 new BackupCodeMethod($backupCodes, $count = 8);
@@ -17,7 +17,7 @@ matches is removed. They stand in for another second factor and are offered afte
 ask for none (as in scheb/2fa). A new set replaces the former; `revoke('backup-code', $account)`
 clears them.
 
-### The backup codes' steps
+## The backup codes' steps
 
 | Step | Answer |
 |---|---|

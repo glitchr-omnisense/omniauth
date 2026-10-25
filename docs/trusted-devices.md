@@ -3,7 +3,7 @@ title: Trusted devices
 order: 35
 ---
 
-## Trusted devices
+# Trusted devices
 
 ```php
 new TrustedDevices($accounts, $trustedVersion, $secret, $lifetime = 2592000, $clock = null);
@@ -32,7 +32,7 @@ The proof: `Tests/TrustedDevicesTest` compares omniauth's tokens with scheb's `J
 for the same input (recorded, and live in the harness, where scheb/2fa is a development
 dependency), and each reads the other's.
 
-### The tokens' checks
+## The tokens' checks
 
 | | |
 |---|---|

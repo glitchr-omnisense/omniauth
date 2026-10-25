@@ -3,7 +3,7 @@ title: Password
 order: 31
 ---
 
-## Password
+# Password
 
 ```php
 new PasswordMethod($accounts, $passwords, $hasher = null);   // null: NativePasswordHasher, bcrypt cost 13 - Symfony's "auto"
@@ -29,7 +29,7 @@ A new password, from the settings: `$omniauth->enrol('password', $account)->conf
 ['password' => 'new', 'current' => 'old'])` - `current` is checked when it is given (leave it out
 for a reset by e-mail) - and every trusted browser falls back to the second factor.
 
-### What is checked
+## What is checked
 
 | Case | Answer |
 |---|---|

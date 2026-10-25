@@ -3,7 +3,7 @@ title: Concepts
 order: 20
 ---
 
-## Concepts
+# Concepts
 
 A sign-in is an **attempt**: one visitor, the factors passed so far, the second factors still
 offered, what a ceremony keeps between its two steps. The **conductor** runs each step against the
@@ -11,7 +11,7 @@ offered, what a ceremony keeps between its two steps. The **conductor** runs eac
 requests (`Contract\State`) and reads the result to answer the visitor. The interfaces the
 application and the host fill in are [the contracts](contracts.md).
 
-### The conductor
+## The conductor
 
 ```php
 use Omniauth\Omniauth;
@@ -48,7 +48,7 @@ A factor is given as the enum or as its value (`'email-code'`); a value that is 
 PHP's `\ValueError`, a factor no method was mounted for `Exception\UnknownMethod`
 ([Errors](errors.md)).
 
-#### What verify() does
+### What verify() does
 
 The same sequence whatever the method - that single sequence is what makes the behaviour the same
 under every host:
@@ -85,7 +85,7 @@ second one needs the attempt in progress and a factor it offered; the throttle's
 refuse; the method's challenge is returned and the attempt saved. A method that is not
 `Challenging` has nothing to begin: `LogicException`.
 
-#### Enrolment
+### Enrolment
 
 ```php
 $enrolment = $omniauth->enrol('email-code', $account);    // LogicException for a method that is not Enrolling
@@ -107,7 +107,7 @@ the trusted device itself (which forgets every browser), and dispatches `Event\C
 A method that is not `Revocable` (the password, the link, a passkey, an identity provider) throws a
 `LogicException`.
 
-### The attempt
+## The attempt
 
 `Omniauth\Attempt` is what `State` keeps between two requests, as an array of scalars:
 
@@ -138,7 +138,7 @@ attempt. Anything malformed in the state reads as no attempt.
 
 `identify()`, `pass()`, `offer()` and `remember()` are the conductor's (`@internal`).
 
-### The result
+## The result
 
 `Omniauth\Result`, read-only:
 
@@ -181,7 +181,7 @@ $account)` builds a failure.
 | `NotOffered` | `not-offered` | a second factor the attempt did not offer |
 | `NotEnrolled` | `not-enrolled` | a factor this account has not set up; an identity the rule will not link by its address (`link-from-settings`) |
 
-### Factors
+## Factors
 
 `Omniauth\Factor` names what a person proves, once for every method, policy and host: the key of
 routes, settings and translations.
@@ -200,7 +200,7 @@ routes, settings and translations.
 `Factor::of(Factor|string)` gives the case (PHP's `\ValueError` for an unknown value);
 `role()` gives `Role::First` (it finds the account) or `Role::Second` (the account is known).
 
-### The request and the proof
+## The request and the proof
 
 `Omniauth\Context`, read-only - what the host knows of the request, with no object of its framework:
 
@@ -227,7 +227,7 @@ factor: the host sets its remember-me) and `trust` (at the second: a trusted-dev
 | `json(): string` | the `json` key, or every value encoded |
 | `all(): array` | |
 
-### What a ceremony gives back
+## What a ceremony gives back
 
 `Method\Challenge`, the answer of `begin()` and of an enrolment's `begin()`:
 
@@ -248,7 +248,7 @@ link's token or the code as `secret` - never logged, never stored as it is.
 `PendingIdentity` (`provider`, `subject`, `email`, `emailVerified`, `name`) is someone a provider
 vouched for whom no account is linked to.
 
-### Method interfaces
+## Method interfaces
 
 A method checks a proof within an attempt and touches neither request nor response. Its
 interfaces, in `Omniauth\Method\` - what the conductor asks of it:

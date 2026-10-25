@@ -3,14 +3,14 @@ title: Errors
 order: 50
 ---
 
-## Errors
+# Errors
 
 A visitor's mistake is never an exception: a wrong password, an expired code, a forged return
 from a provider, too many tries all come back as a `Result` (or a `Challenge`, an `Enrolled`) with
 a `Failure` and, often, a reason ([Concepts](concepts.md#the-result)). Exceptions are the host's
 and the application's mistakes, and the one refusal a store throws on purpose.
 
-### The exceptions
+## The exceptions
 
 Every exception class of omniauth implements `Omniauth\Exception\OmniauthException` (a
 `\Throwable`):
@@ -22,7 +22,7 @@ Every exception class of omniauth implements `Omniauth\Exception\OmniauthExcepti
 | `OAuth\Exception\ProviderError` | `\RuntimeException` | by a provider (`Provider::identify()`): it vouched for nobody. `$reason`: `exchange-failed` (`ProviderError::EXCHANGE`), `invalid-id-token` (`ID_TOKEN`), `no-subject` (`SUBJECT`), `hosted-domain` (`HOSTED_DOMAIN`). `OAuthMethod` catches it and answers `bad-credentials` with that reason; the message (and the previous exception, league's or Guzzle's) is for the server's log, never the page |
 | `Omniauth\Otp\Exception\UnreadableSecret` (omniauth/otp) | `\RuntimeException` | a sealed TOTP secret that does not open (another key, an altered row): not caught by the method - a sign-in with that factor fails loudly rather than letting the account in without it |
 
-### Programming errors
+## Programming errors
 
 Not `OmniauthException`s - a host or an application calling omniauth wrongly:
 
@@ -54,7 +54,7 @@ echo $result->status->value, ' ', $result->failure->value, ' ', $result->reason,
 // failed account-refused banned pete
 ```
 
-### The failures and their reasons
+## The failures and their reasons
 
 What a page translates - `Result::$failure`, and `Result::$reason` under it:
 
@@ -77,7 +77,7 @@ What a page translates - `Result::$failure`, and `Result::$reason` under it:
 | `not-enrolled` | - | a factor the account has not set up (TOTP without a secret, an untrusted browser) |
 | | `link-from-settings` | an identity provider: an account the rule will not link by its address |
 
-### What to catch where
+## What to catch where
 
 | Where | Catch |
 |---|---|

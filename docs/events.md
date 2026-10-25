@@ -3,7 +3,7 @@ title: Events
 order: 38
 ---
 
-## Events
+# Events
 
 PSR-14, optional: pass any `EventDispatcherInterface` as `events:`.
 
@@ -20,7 +20,7 @@ PSR-14, optional: pass any `EventDispatcherInterface` as `events:`.
 
 A refusal ends the attempt with `Failure::Refused` and the listener's reason in `Result::$reason`.
 
-### What each event carries
+## What each event carries
 
 | Event | Properties (read-only) | Dispatched by |
 |---|---|---|

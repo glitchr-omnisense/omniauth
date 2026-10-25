@@ -3,7 +3,7 @@ title: The Docker harness
 order: 70
 ---
 
-## The Docker harness
+# The Docker harness
 
 `docker/` runs this package with every `omniauth/*` method package - from GitHub (branch 1.x), or
 from the checkouts beside this one when `OMNIAUTH_PLUGINS=../..` is set in `docker/.env` - on PHP
@@ -27,7 +27,7 @@ a link, then the same link again; a password of 102 bytes hashed by Symfony; six
 checks that nothing is loaded but omniauth, the PSR interfaces and symfony/password-hasher - not a
 class of a framework, of scheb/2fa or of an application, though the harness has them installed.
 
-### Running a script of your own
+## Running a script of your own
 
 The entrypoint also runs `php`, `composer` and `sh` as they are; the harness's autoloader is
 `/harness/vendor/autoload.php`. The examples of this manual were run so, a scratch directory

@@ -3,7 +3,7 @@ title: Identity providers (OAuth 2, OpenID Connect)
 order: 36
 ---
 
-## Identity providers (OAuth 2, OpenID Connect)
+# Identity providers (OAuth 2, OpenID Connect)
 
 ```sh
 composer require omniscient/omniauth omniauth/google
@@ -72,7 +72,7 @@ with `$result->reason` translated.
 
 Next: the method and its linking rule, then the providers, below.
 
-### The method
+## The method
 
 `OAuthMethod` is a first factor (`Factor::OAuth`), `Challenging` and `Enrolling`:
 
@@ -88,7 +88,7 @@ new OAuthMethod(
 
 `providers()` gives the `Providers` it serves (what the sign-in page lists: `names()`).
 
-### The trip
+## The trip
 
 | | |
 |---|---|
@@ -101,7 +101,7 @@ a log or a referrer, or injected with the victim's state): the provider refuses 
 another trip's verifier. The nonce ties the ID token to the trip. What the attempt keeps lives as
 long as the attempt (ten minutes).
 
-### Who it is: the linking rule (QA3)
+## Who it is: the linking rule (QA3)
 
 1. **The account linked to the provider's subject** (`Identities::owner($provider, $sub)`), whatever
    the address says now: Google's `sub` is the person's stable identifier there; an address can
@@ -127,14 +127,14 @@ long as the attempt (ten minutes).
 An address the provider does not vouch for is **never looked up**: an unverified address finds no
 account, and the sign-up knows it is not proved (`emailVerified: false`).
 
-### After it
+## After it
 
 The conductor does what it does after any first factor: `Accounts::check()` (banned, locked...),
 then the second-factor rule - **an account that has a second factor passes it after Google**
 (Marco's QA2: `EnrolledSecondFactors::AFTER` holds `Factor::OAuth`; lesringostars today signs in
 by Google without it).
 
-### From the settings
+## From the settings
 
 ```php
 $enrolment = $omniauth->enrol(Factor::OAuth, $account);
@@ -148,7 +148,7 @@ when another account holds it (`linked-elsewhere`), and an account keeps one ide
 (`other-identity`). With one return address per provider, the host tells the two apart by whether
 the visitor is signed in: signed in, `enrol()->confirm()`; not, `verify()`.
 
-### Refusals
+## Refusals
 
 `bad-credentials` with a stable reason: `unknown-provider` (at the beginning), `state-mismatch`,
 `provider-denied` (the person said no: `error=access_denied`), `provider-error`, `missing-code`,
@@ -164,7 +164,7 @@ method's clock). Turning a link off is the store's `Identities::unlink($account,
 the host's settings page calls; omnibase's store is `Base\Auth\UserIdentities` on its
 `userIdentity` table.
 
-### The providers
+## The providers
 
 A provider (`Provider\Provider`) gives the authorization address for an `Authorization` (state,
 verifier, nonce, the origin the trip began at) and, for the code that came back, the `Identity` it
@@ -173,7 +173,7 @@ to a real server: **each provider is a package of its own** (Marco's decision, 2
 of omnishield's captchas) - [omniauth/google](https://github.com/glitchr-studio/omniauth-google)
 first, over league/oauth2-google.
 
-### The return address
+## The return address
 
 A provider's return address is its configuration's, never a request's: an absolute address, or a
 **path** (`/login/google/callback`). A path is completed by the origin of the request that began
@@ -183,7 +183,7 @@ back to the host they left from - never to the first host the worker served -, a
 repeats that trip's address, as an authorization server compares them. Each address must be one of
 the client's registered return addresses at the provider.
 
-### By configuration
+## By configuration
 
 `Providers::configured()` reads the tree a host's `omniauth.yaml` (or `config/omniauth.php`) holds,
 each entry made by the first factory (`Provider\ProviderFactory`) that knows its kind:
@@ -203,7 +203,7 @@ service) sit beside them: `new Providers($given, ...Providers::configured($confi
 omniauth/google's factory when that package is installed; `Omniauth\OAuth\Provider\GoogleProvider`
 is an alias of omniauth/google's class for the same release.
 
-### Over league/oauth2-client
+## Over league/oauth2-client
 
 `Provider\LeagueProvider` makes any league/oauth2-client provider an omniauth `Provider`: the
 authorization address with omniauth's state and S256 challenge, the code exchanged with its
@@ -256,7 +256,7 @@ person is `getResourceOwner()`'s `toArray()` (a failure `exchange-failed`, leagu
 keeps every detail in `claims`. A subclass overrides `authorizationOptions()`, `identity()`,
 `details()` or `fromClaims()` (omniauth/google adds the nonce and reads the ID token).
 
-### In tests
+## In tests
 
 `Testing\FakeProvider` is an authorization server in memory: `consent($authorizationUrl, $person)`
 gives the return's `code` and `state`, `deny()` an `access_denied`; `identify()` exchanges a code
@@ -282,7 +282,7 @@ an address not of its client and return address, or without its challenge
 that is not the challenge's, a return address that is not the authorization's are `ProviderError`
 `exchange-failed`; a nonce that is not the trip's `invalid-id-token`.
 
-### Conformance suite
+## Conformance suite
 
 `Omniauth\Testing\ProviderContractTests` is the `Provider` contract as PHPUnit tests: every provider
 package runs it in a `Tests/<Name>ContractTest.php` of its own (`FakeProvider` in the core's

@@ -3,7 +3,7 @@ title: Symfony and Laravel
 order: 14
 ---
 
-## Symfony and Laravel
+# Symfony and Laravel
 
 omniauth is the same under every host; the bridges live in omnibridge (Marco's decision QA8),
 where omniauth is only suggested:

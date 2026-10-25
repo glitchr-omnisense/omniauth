@@ -3,9 +3,9 @@ title: Verified, and not
 order: 90
 ---
 
-## Verified, and not
+# Verified, and not
 
-### What the tests prove
+## What the tests prove
 
 Run on 2026-10-25 in the [harness](harness.md) (`docker compose run --rm omniauth test`, PHP
 8.4.26, PHPUnit 11.5.57), the four packages from their checkouts: 235 tests, 2490 assertions,
@@ -43,7 +43,7 @@ in through omniauth alone: each method, the second factor, its page and nobody e
 CSRF, throttle, remember-me, trusted device, a simulated Google, the return address on the host of
 each request under one container) and of omnibridge/laravel; they were not run for this manual.
 
-### What is not verified
+## What is not verified
 
 - An application's own stores: omnibase fills them (`Base\Auth\`, step AU4) and tests them in its
   own suite.
@@ -57,7 +57,7 @@ each request under one container) and of omnibridge/laravel; they were not run f
   its 1.x branch; the `omniauth.yaml` defaults were resolved with Symfony's Config `Processor` in
   omnibridge/symfony's image, the Laravel defaults read from `Auth\Settings`.
 
-### Responsibility
+## Responsibility
 
 omniscient/omniauth and its `omniauth/*` packages are independent code: omniauth/google is an
 unofficial client of Google's sign-in, not affiliated with or endorsed by Google, and whoever runs

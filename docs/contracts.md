@@ -3,12 +3,12 @@ title: The contracts
 order: 21
 ---
 
-## The contracts
+# The contracts
 
 omniauth decides who signs in; the application keeps its accounts and their proofs, the host its
 request, response, session and pages. Between them, small interfaces in `Omniauth\Contract\`.
 
-### The accounts
+## The accounts
 
 `Accounts` - an account is any object of the application, which implements nothing of omniauth:
 
@@ -23,7 +23,7 @@ request, response, session and pages. Between them, small interfaces in `Omniaut
 `check()` is called after the proof passed, never before: an unknown address and a banned account
 are told apart only once the password is right.
 
-### The stores of each proof
+## The stores of each proof
 
 One store per proof, so a site takes only what it serves:
 
@@ -43,7 +43,7 @@ No table, no ORM here: the structure stays the application's, described once, re
 `Omniauth\Testing\InMemoryStore` implements all of them but the passkeys over `TestAccount`
 objects ([Testing](testing.md)).
 
-### The host's small duties
+## The host's small duties
 
 | Duty | Contract | Plain PHP and tests | Symfony / Laravel (omnibridge) |
 |---|---|---|---|

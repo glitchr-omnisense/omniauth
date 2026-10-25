@@ -3,7 +3,7 @@ title: Code by e-mail
 order: 33
 ---
 
-## Code by e-mail
+# Code by e-mail
 
 ```php
 new EmailCodeMethod($accounts, $emailCodes, $sender, $secret, $digits = 6, $lifetime = 600, $clock = null);
@@ -23,7 +23,7 @@ Turning it on, from the settings: `enrol('email-code', $account)->begin($context
 `->confirm($context, ['code' => ...])` checks it and turns the factor on. Off: `revoke('email-code',
 $account)` - the trusted browsers fall back with it.
 
-### The code's steps
+## The code's steps
 
 | Step | Answer |
 |---|---|

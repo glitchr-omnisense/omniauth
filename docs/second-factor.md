@@ -3,7 +3,7 @@ title: The second-factor rule
 order: 37
 ---
 
-## The second-factor rule
+# The second-factor rule
 
 ```php
 interface SecondFactorPolicy
@@ -31,7 +31,7 @@ omnibase decorates this one with its `SecurityPolicy` (a role that requires a se
 none is sent to enrol; the demo account never is). Refusing to turn a factor off ("the
 administrator wins") is a listener of `Event\Revoking`.
 
-### How the default rule decides
+## How the default rule decides
 
 `EnrolledSecondFactors::required($account, $passed, $context)`, with `$after` the list above:
 

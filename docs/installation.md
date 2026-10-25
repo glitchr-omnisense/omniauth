@@ -3,14 +3,14 @@ title: Installation
 order: 10
 ---
 
-## Installation
+# Installation
 
 ```sh
 composer require omniscient/omniauth                       # password, link, code by e-mail, backup codes, trusted devices, identity providers
 composer require omniauth/otp omniauth/webauthn omniauth/google   # an authenticator application, passkeys, Google: one package each
 ```
 
-### Requirements
+## Requirements
 
 - PHP 8.2 or later.
 - `omniscient/omniauth` requires `psr/cache` (^2.0 or ^3.0), `psr/simple-cache` (^2.0 or ^3.0),
@@ -25,7 +25,7 @@ composer require omniauth/otp omniauth/webauthn omniauth/google   # an authentic
   `omniauth/webauthn` adds `ext-openssl`, web-auth/webauthn-lib, symfony/serializer and symfony/uid;
   `omniauth/google` adds league/oauth2-client and league/oauth2-google (Guzzle through them).
 
-### Plain PHP
+## Plain PHP
 
 No framework, no ORM: the accounts and their proofs stay in your tables, behind small store
 contracts ([The contracts](contracts.md)). The whole thing by hand - the in-memory stores of
@@ -124,7 +124,7 @@ The same script with Google in place of the password is the [identity providers]
 page's; with an authenticator application, omniauth/otp's installation page; with a passkey,
 omniauth/webauthn's.
 
-### In a framework
+## In a framework
 
 - **Symfony**: omnibridge/symfony's `OmnibridgeBundle` registers omniauth's extension where
   omniauth is installed; `config/packages/omniauth.yaml` turns each method on, and one

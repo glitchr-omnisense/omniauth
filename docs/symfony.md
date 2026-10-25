@@ -3,7 +3,7 @@ title: Symfony
 order: 15
 ---
 
-## Symfony
+# Symfony
 
 omniauth runs without a framework ([Installation](installation.md)); in a Symfony application,
 omnibridge/symfony (`Omnibridge\Symfony\Auth\`) does the wiring: the conductor and its methods from
@@ -11,7 +11,7 @@ omnibridge/symfony (`Omnibridge\Symfony\Auth\`) does the wiring: the conductor a
 voter, trust resolver and gate, the ceremonies' routes and their controller. This page describes
 omnibridge/symfony's `Auth\` namespace at its 1.x branch.
 
-### Registering
+## Registering
 
 ```sh
 composer require omniscient/omniauth omnibridge/symfony
@@ -57,7 +57,7 @@ without omniauth/webauthn, `oauth` without `Omniauth\OAuth\OAuthMethod` stop the
 compilation with a `LogicException` naming the package to require
 (`omniauth.yaml turns "totp" on, which needs omniauth/otp: composer require omniauth/otp.`).
 
-### The configuration tree
+## The configuration tree
 
 `password` and `throttle` are on unless set to `false` (`canBeDisabled`); `link`, `email_code`,
 `backup_codes`, `trusted_device`, `totp`, `passkey` and `oauth` are off unless their key is present
@@ -140,7 +140,7 @@ tree with Symfony's Config `Processor` in omnibridge/symfony's image on 2026-10-
 > `type`), where the names suggest a league provider class, its options and its fields. A provider
 > of another kind is given as a `service`, or made by an application's own factory.
 
-### Services
+## Services
 
 | Service id | Class | |
 |---|---|---|
@@ -172,7 +172,7 @@ autoconfigured with the tag `omniauth.oauth_provider_factory` and makes the entr
 
 The bridge registers no console command and no Twig function.
 
-### The authenticator
+## The authenticator
 
 `OmniauthAuthenticator` knows a sign-in by its route (the router runs before the firewall):
 
@@ -213,7 +213,7 @@ The session keys it uses: `_security.last_username` (the identifier typed),
 `subject`, `email`, `emailVerified`, `name`), and omniauth's own `omniauth.attempt` and
 `omniauth.enrolment.<factor>`.
 
-#### Messages
+### Messages
 
 A failure's message is looked up as `<failure>:<reason>`, then `<failure>`, in `messages` over
 these defaults (Security's own message keys, which its translations already have):
@@ -234,7 +234,7 @@ omniauth:
         'refused': 'security.refused.%reason%'
 ```
 
-### The routes
+## The routes
 
 `omniauth: { resource: ., type: omniauth }` imports, under the names and at the addresses
 configured:
@@ -261,7 +261,7 @@ scheb/2fa's `FormController` gave it, so a template written for scheb/2fa render
 code by e-mail is sent when its page is first shown, and again once it has expired. The page is
 answered with `Cache-Control: no-store`.
 
-### Between two factors
+## Between two factors
 
 - `PendingToken`: the token of a visitor whose first factor passed. It carries no role, is never
   "fully" signed in (`PendingTrustResolver` refuses `IS_AUTHENTICATED_FULLY` to it) and lists the

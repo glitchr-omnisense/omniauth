@@ -3,7 +3,7 @@ title: Laravel
 order: 16
 ---
 
-## Laravel
+# Laravel
 
 omnibridge/laravel (`Omnibridge\Laravel\Auth\`, step AU8) wires omniauth under Laravel as
 omnibridge/symfony wires it under Symfony, from `config/omniauth.php` - the same keys as
@@ -12,7 +12,7 @@ own: a guard and a user provider, the gate's answers to Security's attributes, t
 the sign-out and a signed remember-me cookie. This page describes omnibridge/laravel's `Auth\`
 namespace at its 1.x branch.
 
-### Turning it on
+## Turning it on
 
 ```sh
 composer require omniscient/omniauth omnibridge/laravel
@@ -33,7 +33,7 @@ exists; the provider wires nothing at boot unless `omnibridge.auth` is on (`true
 `null` is off, the default). The controllers read the **default** guard, which must be the
 `omniauth` one (`LogicException` otherwise).
 
-### config/omniauth.php
+## config/omniauth.php
 
 Each method's key turns it on; `null` (or `false`) turns it off. The defaults are those the
 provider fills in (`Auth\Settings`), the same as `omniauth.yaml`'s where both have the key.
@@ -90,7 +90,7 @@ provider fills in (`Auth\Settings`), the same as `omniauth.yaml`'s where both ha
 | `messages` | `[]` | by failure or `failure:reason`, `%reason%` replaced: the same lookup and defaults as under [Symfony](symfony.md#messages) |
 | `routes` | `true` | `false`: declare the routes yourself with `Omnibridge\Laravel\Auth\Routes::register($router, $settings)` |
 
-### Bindings
+## Bindings
 
 | Binding | What |
 |---|---|
@@ -110,7 +110,7 @@ answers Security's attributes from the gate (`Gate::before`, `Auth\Roles`); leav
 reads them plain); appends `Middleware\SecondFactorPending` to the `web` group, before the auth
 middleware; registers the routes; and, with omnibase's stores, its sign-in listeners.
 
-### Routes
+## Routes
 
 In the `web` group, without Laravel's CSRF middleware (the forms' tokens are checked by the bridge
 through the `Tokens` contract, with Security's field names):
@@ -138,7 +138,7 @@ variables as under [Symfony](symfony.md#the-routes), so the Symfony site's templ
 unchanged. Pages are rendered through the bound `Base\Screen\Negotiation` and answered with
 `Cache-Control: no-store, private`.
 
-### The guard
+## The guard
 
 `Auth\OmniauthGuard` (a `StatefulGuard`) keeps the account's handle in the session
 (`omnibridge.auth.handle`) and reads the account back through omniauth's `Accounts` at each
@@ -173,7 +173,7 @@ token is stored.
 `Middleware\SecondFactorPending` sends a visitor between two factors to the second factor's page
 from any route but the page, its check, the sign-out's two routes and `second_factor.open_routes`.
 
-### With omnibase
+## With omnibase
 
 With `stores: 'omnibase'` and omniscient/omnibase 4.x, `Auth\OmnibaseEffects` registers what a
 sign-in does around omniauth under Symfony, with the same omnibase classes: the browsers an account

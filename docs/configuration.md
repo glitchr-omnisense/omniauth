@@ -3,14 +3,14 @@ title: Configuration reference
 order: 40
 ---
 
-## Configuration reference
+# Configuration reference
 
 omniauth has no configuration file of its own: each class takes its options in its constructor.
 The hosts' files - `config/packages/omniauth.yaml` ([Symfony](symfony.md#the-configuration-tree))
 and `config/omniauth.php` ([Laravel](laravel.md#configomniauthphp)) - are the bridges' and build
 these classes from their keys.
 
-### The conductor's options
+## The conductor's options
 
 `new Omniauth(...)`:
 
@@ -25,7 +25,7 @@ these classes from their keys.
 | `clock` | `?Psr\Clock\ClockInterface` | `null`: `SystemClock` | an attempt's age |
 | `lifetime` | `int` | `600` (`Omniauth::LIFETIME`) | seconds an attempt (and an enrolment) lasts |
 
-### The methods of the core
+## The methods of the core
 
 | Class | Argument | Type | Default |
 |---|---|---|---|
@@ -54,7 +54,7 @@ The packages' methods: omniauth/otp's `TotpMethod` (`leeway` 0, `period` 30, `di
 (`rp`: a `RelyingParty` with `id`, `name`, `origins`, `insecure`; `timeout`) - their manuals list
 every option.
 
-### The second-factor rule
+## The second-factor rule
 
 `new EnrolledSecondFactors(Methods $methods, array $after = EnrolledSecondFactors::AFTER)`:
 `$after` lists the first factors a second one follows, `[Factor::Password, Factor::Link,
@@ -62,7 +62,7 @@ Factor::OAuth]` by default ([The second-factor rule](second-factor.md)).
 `new NoSecondFactorLinking(Methods $methods)` reads the methods when it is asked, so it can be built
 before the OAuth method is added to them.
 
-### The throttle's limits
+## The throttle's limits
 
 `new CacheThrottle($cache, array $limits = [], ?ClockInterface $clock = null, string $prefix =
 'omniauth.throttle.')` counts the tries in any PSR-6 pool (`CacheItemPoolInterface`) or PSR-16
@@ -145,7 +145,7 @@ bad-credentials from another address
 > try. A host that needs the limit exact under concurrency implements `Contract\Throttle` on a
 > store that counts atomically (a rate limiter with a lock).
 
-### The identity providers
+## The identity providers
 
 `Providers::configured(array $config, ProviderFactory ...$factories)` reads, per entry (its key the
 provider's name):
@@ -165,7 +165,7 @@ entries through omniauth/google's factory.
 `LeagueProvider` and `FakeProvider` take their options in their constructors
 ([Identity providers](oauth.md#over-leagueoauth2-client)).
 
-### The state
+## The state
 
 `new ArrayState(array &$values = [])` keeps the attempt in a PHP array held by reference;
 `ArrayState::session()` over `$_SESSION` (after `session_start()`). The keys it writes are

@@ -3,7 +3,7 @@ title: Testing
 order: 60
 ---
 
-## Testing
+# Testing
 
 `Omniauth\Testing\` holds what a host's tests (and a first try) need, with no library:
 
@@ -55,7 +55,7 @@ second-factor-required by password
 authenticated by totp
 ```
 
-### The test doubles in detail
+## The test doubles in detail
 
 `TestAccount` - public properties, every proof on the account:
 
@@ -81,7 +81,7 @@ contracts over the same accounts. `RecordingSender` keeps `$sent` (account and m
 refuses a second factor and `StubSecondFactor` a first one (`InvalidArgumentException`);
 `StubSecondFactor`'s code is `123456` unless given another.
 
-### Identity providers in tests
+## Identity providers in tests
 
 `Omniauth\OAuth\Testing\FakeProvider` stands in for Google and the person consenting there, with no
 network ([Identity providers](oauth.md#in-tests)); a provider package checks itself against the
@@ -90,7 +90,7 @@ The method packages ship their own doubles: omniauth/otp's `Testing\Authenticato
 phone), omniauth/webauthn's `Testing\SoftwareAuthenticator` (a P-256 authenticator answering as a
 browser) and `Testing\InMemoryPasskeys`.
 
-### In a framework's tests
+## In a framework's tests
 
 Under Symfony and Laravel the stores are services: bind the in-memory ones (or the application's
 on a test database) in the test environment, and replace the `Sender` with a `RecordingSender` to

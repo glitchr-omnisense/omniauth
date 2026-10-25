@@ -3,7 +3,7 @@ title: Sign-in link
 order: 32
 ---
 
-## Sign-in link
+# Sign-in link
 
 ```php
 new LinkMethod($accounts, $linkTokens, $sender, $lifetime = 900, $clock = null);
@@ -29,7 +29,7 @@ account has one.
 The links issued before the switch were kept in clear: a store that still holds some also
 implements `PlainLinkTokens`, and they serve once, as they are, until their end.
 
-### The link's steps
+## The link's steps
 
 | Step | Proof | Answer |
 |---|---|---|

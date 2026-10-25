@@ -3,13 +3,13 @@ title: Writing a method or a provider
 order: 80
 ---
 
-## Writing a method or a provider
+# Writing a method or a provider
 
 omniauth has two extension points: a **method** (a way to prove a factor, `Method\Method`) and an
 **identity provider** (a server the OAuth method sends the visitor to, `OAuth\Provider\Provider`).
 The packages omniauth/otp and omniauth/webauthn are methods; omniauth/google is a provider.
 
-### A method
+## A method
 
 A method checks a proof within an attempt and touches neither request nor response. It implements
 `Method\Method` and, as it needs, the other interfaces of [Methods](concepts.md#method-interfaces):
@@ -80,7 +80,7 @@ cookie's value after `trust`).
 Test a method through the conductor, on the in-memory stores and a `FixedClock`
 ([Testing](testing.md)).
 
-### An identity provider
+## An identity provider
 
 A provider gives the authorization address of a trip and, for the code that came back, the
 `Identity` it vouches for:
@@ -153,7 +153,7 @@ final class ForgeFactory implements ProviderFactory
 application is autoconfigured (tag `omniauth.oauth_provider_factory`); under Laravel, tag its binding
 `omniauth.oauth_provider_factory`.
 
-### Its conformance suite
+## Its conformance suite
 
 A provider package runs `Omniauth\Testing\ProviderContractTests` on recorded answers, in a
 `Tests/<Name>ContractTest.php`: [Conformance suite](oauth.md#conformance-suite) lists what each
