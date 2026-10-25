@@ -29,6 +29,7 @@
         "omniauth/google": "Google sign-in (over league/oauth2-google): its GoogleProvider and the GoogleFactory of Omniauth\\OAuth\\Provider\\Providers::configured()",
         "omniauth/otp": "Authenticator applications (TOTP) over spomky-labs/otphp, and their secrets sealed at rest with sodium (formerly omniauth/totp)",
         "omniauth/webauthn": "Passkeys over web-auth/webauthn-lib (formerly omniauth/passkey)",
+        "phpunit/phpunit": "Omniauth\\Testing\\ProviderContractTests: the identity providers' contract as tests, run by every provider package's tests",
         "omniscient/omnibridge": "The host contracts: Omnibridge\\Contract\\Tokens checks a sign-in form's CSRF token; omnibridge/symfony and omnibridge/laravel bridge omniauth to their host",
         "symfony/cache": "A PSR-6 pool or PSR-16 cache for Omniauth\\CacheThrottle in plain PHP"
     },

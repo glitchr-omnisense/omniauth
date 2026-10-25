@@ -103,6 +103,9 @@ and unrelated.
   alone, `LeagueProvider` included (`BareTest`); the identity providers' trip (state, PKCE, nonce,
   forged and injected returns, the linking rule, a return path on the host of each trip) on the fake
   provider, and `LeagueProvider` over a generic league provider with recorded answers.
+- The providers' conformance suite (`Omniauth\Testing\ProviderContractTests`,
+  [docs/oauth.md](docs/oauth.md#conformance-suite)): green on 2026-10-25 for `FakeProvider` and
+  omniauth/google, on recorded answers (the workspace, 235 tests); no defect found.
 - Not verified: an application's own stores (omnibase fills them at step AU4); a real host (the
   bridges come with AU6 and AU8); a cookie written by a running scheb/2fa on an application (the
   encoder is compared, not a browser's cookie); concurrent tries against `CacheThrottle` (read then

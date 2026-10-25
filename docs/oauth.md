@@ -222,3 +222,39 @@ gives the return's `code` and `state`, `deny()` an `access_denied`; `identify()`
 once, only with the verifier whose challenge the address carried and for the return address it was
 given to, and checks the nonce. Its return address may be a path too. Under it a host's tests sign
 in with no network, and a forged or injected return fails as it would at Google.
+
+### Conformance suite
+
+`Omniauth\Testing\ProviderContractTests` is the `Provider` contract as PHPUnit tests: every provider
+package runs it in a `Tests/<Name>ContractTest.php` of its own (`FakeProvider` in the core's
+`Tests/FakeProviderContractTest.php`, omniauth/google in its `Tests/GoogleContractTest.php`). The
+test case gives the provider for a return address, and makes its server answer - recorded
+answers, no network: `consented()` (the server will vouch for the person on the code it returns,
+the authorization's nonce in its ID token), `refused()` (an `invalid_grant`), and `unanswered()`
+(an HTTP 503 or no connection; null, the default, for a provider in memory). With `factory()` and
+`entry()` it checks the factory too, with `secret()` that no message shows the client's secret.
+
+| | |
+|---|---|
+| The authorization address | https, the trip's state, the S256 challenge (never the verifier), `response_type=code`, the client, the nonce (`sendsNonce()`), the configured return address; each trip its own |
+| A return path | completed by the trip's origin; no origin known: a `LogicException` |
+| The exchange | a code the server vouches for: an `Identity` of this provider, its subject, an address said verified only when there is one |
+| Refusals | a refused code, a server that does not answer: a `ProviderError` with the reason `exchange-failed`, never another exception, never the secret in its message |
+| The factory | named after the entry's key; null for an entry of another kind; through `Providers::configured()`, an entry without a `client_id` left out, one without a `redirect_uri` an `InvalidArgumentException` |
+
+```php
+use Omniauth\Testing\ProviderContractTests;
+
+final class GoogleContractTest extends TestCase
+{
+    use ProviderContractTests;
+
+    protected function provider(string $redirectUri): Provider { /* a GoogleProvider on a Guzzle MockHandler */ }
+    protected function consented(Provider $provider, Authorization $authorization, string $authorizationUrl): string { /* the token answer queued */ }
+    protected function refused(Provider $provider): string { /* an invalid_grant queued */ }
+    protected function unanswered(Provider $provider): string { /* a 503 queued */ }
+}
+```
+
+The methods (`Method\Method`: passwords, codes, TOTP, passkeys) are another contract, each with
+its own tests: this suite is the identity providers'.
