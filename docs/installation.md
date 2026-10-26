@@ -6,20 +6,20 @@ order: 10
 # Installation
 
 ```sh
-composer require omniscient/omniauth                       # password, link, code by e-mail, backup codes, trusted devices, identity providers
+composer require omnisense/omniauth                       # password, link, code by e-mail, backup codes, trusted devices, identity providers
 composer require omniauth/otp omniauth/webauthn omniauth/google   # an authenticator application, passkeys, Google: one package each
 ```
 
 ## Requirements
 
 - PHP 8.2 or later.
-- `omniscient/omniauth` requires `psr/cache` (^2.0 or ^3.0), `psr/simple-cache` (^2.0 or ^3.0),
+- `omnisense/omniauth` requires `psr/cache` (^2.0 or ^3.0), `psr/simple-cache` (^2.0 or ^3.0),
   `psr/clock` (^1.0), `psr/event-dispatcher` (^1.0) and `symfony/password-hasher` (^6.4, ^7.0 or
   ^8.0), a component that loads no framework. Nothing else: no ORM, no HTTP client, no OAuth
   library.
 - It suggests `league/oauth2-client` (`Omniauth\OAuth\Provider\LeagueProvider`: the provider
   packages require it), `symfony/cache` (a PSR-6 pool or PSR-16 cache for `CacheThrottle` in plain
-  PHP), `phpunit/phpunit` (the providers' conformance suite) and `omniscient/omnibridge` (the hosts'
+  PHP), `phpunit/phpunit` (the providers' conformance suite) and `omnisense/omnibridge` (the hosts'
   contracts, among them `Omnibridge\Contract\Tokens` for a form's CSRF token).
 - `omniauth/otp` adds `ext-sodium`, spomky-labs/otphp and paragonie/constant_time_encoding;
   `omniauth/webauthn` adds `ext-openssl`, web-auth/webauthn-lib, symfony/serializer and symfony/uid;

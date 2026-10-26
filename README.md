@@ -1,4 +1,4 @@
-# omniscient/omniauth
+# omnisense/omniauth
 
 Who signs in, and by which factors, **under any PHP host**: the methods and their ceremonies
 (begin, then verify), the second-factor rule, and the result of an attempt - who, what passed,
@@ -41,14 +41,14 @@ hosts are bridged in omnibridge:
 
 | Package | What |
 |---|---|
-| `omniscient/omniauth` (here) | the contracts, the conductor, the methods that need no library: password, sign-in link, code by e-mail, backup codes, trusted devices; the sign-in through identity providers (`Omniauth\OAuth\`: the state, PKCE and nonce, the linking by `sub`, the sign-up of an unknown identity; `LeagueProvider` for any league/oauth2-client provider, league suggested); events; `Testing\` |
-| [`omniauth/webauthn`](https://github.com/glitchr-studio/omniauth-webauthn) | passkeys, over web-auth/webauthn-lib; compatible both ways with web-auth/webauthn-symfony-bundle's records (formerly omniauth/passkey) |
-| [`omniauth/otp`](https://github.com/glitchr-studio/omniauth-otp) | authenticator applications (TOTP), over spomky-labs/otphp, on scheb/2fa's parameters; a code once; the secrets sealed at rest with sodium (formerly omniauth/totp) |
-| [`omniauth/google`](https://github.com/glitchr-studio/omniauth-google) | Google, over league/oauth2-google: one package per provider |
+| `omnisense/omniauth` (here) | the contracts, the conductor, the methods that need no library: password, sign-in link, code by e-mail, backup codes, trusted devices; the sign-in through identity providers (`Omniauth\OAuth\`: the state, PKCE and nonce, the linking by `sub`, the sign-up of an unknown identity; `LeagueProvider` for any league/oauth2-client provider, league suggested); events; `Testing\` |
+| [`omniauth/webauthn`](https://github.com/glitchr-omnisense/omniauth-webauthn) | passkeys, over web-auth/webauthn-lib; compatible both ways with web-auth/webauthn-symfony-bundle's records (formerly omniauth/passkey) |
+| [`omniauth/otp`](https://github.com/glitchr-omnisense/omniauth-otp) | authenticator applications (TOTP), over spomky-labs/otphp, on scheb/2fa's parameters; a code once; the secrets sealed at rest with sodium (formerly omniauth/totp) |
+| [`omniauth/google`](https://github.com/glitchr-omnisense/omniauth-google) | Google, over league/oauth2-google: one package per provider |
 | omniauth/oauth | **abandoned**: its mechanics are this package's `Omniauth\OAuth\` since 2026-10-23 (same namespace, same class names); its last release is empty and requires this one |
 | omnibridge/symfony, omnibridge/laravel | an authenticator per firewall; a guard and a user provider |
 
-The name: OmniAuth is also Ruby's well-known sign-in library. This one is PHP, under `omniscient/`,
+The name: OmniAuth is also Ruby's well-known sign-in library. This one is PHP, under `omnisense/`,
 and unrelated.
 
 ## The shape

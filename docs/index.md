@@ -1,4 +1,4 @@
-# omniscient/omniauth
+# omnisense/omniauth
 
 Omniauth decides who signs in, and by which factors, under any PHP host. A sign-in is a ceremony
 of one or two steps - `begin()` (send a link or a code, give a passkey's options, send the visitor
@@ -27,7 +27,7 @@ omnibridge (`omnibridge/symfony`, `omnibridge/laravel`), where omniauth is only 
 ([Symfony](symfony.md), [Laravel](laravel.md)).
 
 The name: OmniAuth is also Ruby's well-known sign-in library. This one is PHP, published under
-`omniscient/`, and unrelated.
+`omnisense/`, and unrelated.
 
 ### When to use it
 
@@ -55,14 +55,14 @@ settings (`Method\Enrolling`, `$omniauth->enrol()`); "turn off" `$omniauth->revo
 
 | Factor (`Factor::`) | Class | Package | Role | begin | Set up | Turn off |
 |---|---|---|---|---|---|---|
-| `password` (`Password`) | `Password\PasswordMethod` | `omniscient/omniauth` | first | - | yes: a new password | - |
-| `link` (`Link`) | `Link\LinkMethod` | `omniscient/omniauth` | first | yes: sends the link | - | - |
-| `oauth` (`OAuth`) | `OAuth\OAuthMethod` | `omniscient/omniauth` | first | yes: the provider's address | yes: links a provider | - (the store's `Identities::unlink()`) |
-| `passkey` (`Passkey`) | `Omniauth\WebAuthn\PasskeyMethod` | [`omniauth/webauthn`](https://github.com/glitchr-studio/omniauth-webauthn) | first | yes: the request options | yes: registers a passkey | - |
-| `email-code` (`EmailCode`) | `EmailCode\EmailCodeMethod` | `omniscient/omniauth` | second | yes: sends the code | yes | yes |
-| `totp` (`Totp`) | `Omniauth\Otp\TotpMethod` | [`omniauth/otp`](https://github.com/glitchr-studio/omniauth-otp) | second | - | yes: a secret and its QR address | yes |
-| `backup-code` (`BackupCode`) | `BackupCode\BackupCodeMethod` | `omniscient/omniauth` | second | - | yes: draws a new set | yes |
-| `trusted-device` (`TrustedDevice`) | `TrustedDevice\TrustedDevices` | `omniscient/omniauth` | second, read from the cookie (`Method\Ambient`) | - | - (given after a second factor with `trust`) | yes: every browser forgotten |
+| `password` (`Password`) | `Password\PasswordMethod` | `omnisense/omniauth` | first | - | yes: a new password | - |
+| `link` (`Link`) | `Link\LinkMethod` | `omnisense/omniauth` | first | yes: sends the link | - | - |
+| `oauth` (`OAuth`) | `OAuth\OAuthMethod` | `omnisense/omniauth` | first | yes: the provider's address | yes: links a provider | - (the store's `Identities::unlink()`) |
+| `passkey` (`Passkey`) | `Omniauth\WebAuthn\PasskeyMethod` | [`omniauth/webauthn`](https://github.com/glitchr-omnisense/omniauth-webauthn) | first | yes: the request options | yes: registers a passkey | - |
+| `email-code` (`EmailCode`) | `EmailCode\EmailCodeMethod` | `omnisense/omniauth` | second | yes: sends the code | yes | yes |
+| `totp` (`Totp`) | `Omniauth\Otp\TotpMethod` | [`omniauth/otp`](https://github.com/glitchr-omnisense/omniauth-otp) | second | - | yes: a secret and its QR address | yes |
+| `backup-code` (`BackupCode`) | `BackupCode\BackupCodeMethod` | `omnisense/omniauth` | second | - | yes: draws a new set | yes |
+| `trusted-device` (`TrustedDevice`) | `TrustedDevice\TrustedDevices` | `omnisense/omniauth` | second, read from the cookie (`Method\Ambient`) | - | - (given after a second factor with `trust`) | yes: every browser forgotten |
 
 A first factor finds the account; a second one is asked of an account already found. The default
 rule ([The second-factor rule](second-factor.md)) asks a second factor after a password, a link or
@@ -77,10 +77,10 @@ each provider is a package of its own.
 
 | Package | Provider | Class, factory | What it checks |
 |---|---|---|---|
-| [`omniauth/google`](https://github.com/glitchr-studio/omniauth-google) | Google (OpenID Connect, over league/oauth2-google) | `Omniauth\Google\GoogleProvider`, `GoogleFactory` (entries named `google` or of `type: google`) | scopes `openid email profile`, the nonce, the ID token's issuer, audience, authorized party, lifetime, nonce and Workspace domain (`hd`); `email_verified`; the userinfo when the ID token has no address |
-| `omniscient/omniauth` | any league/oauth2-client provider, by hand | `Omniauth\OAuth\Provider\LeagueProvider` | the state and the S256 challenge in the address, the code exchanged with the verifier, the subject, address and name read from the resource owner's details |
-| `omniscient/omniauth` | none: an authorization server in memory, for tests | `Omniauth\OAuth\Testing\FakeProvider` | a code once, for its client and return address, with the verifier of its challenge and the nonce |
-| omniauth/oauth | - | - | **abandoned** since 2026-10-23: its last release holds no code and requires `omniscient/omniauth`, whose `Omniauth\OAuth\` has the same namespace and class names |
+| [`omniauth/google`](https://github.com/glitchr-omnisense/omniauth-google) | Google (OpenID Connect, over league/oauth2-google) | `Omniauth\Google\GoogleProvider`, `GoogleFactory` (entries named `google` or of `type: google`) | scopes `openid email profile`, the nonce, the ID token's issuer, audience, authorized party, lifetime, nonce and Workspace domain (`hd`); `email_verified`; the userinfo when the ID token has no address |
+| `omnisense/omniauth` | any league/oauth2-client provider, by hand | `Omniauth\OAuth\Provider\LeagueProvider` | the state and the S256 challenge in the address, the code exchanged with the verifier, the subject, address and name read from the resource owner's details |
+| `omnisense/omniauth` | none: an authorization server in memory, for tests | `Omniauth\OAuth\Testing\FakeProvider` | a code once, for its client and return address, with the verifier of its challenge and the nonce |
+| omniauth/oauth | - | - | **abandoned** since 2026-10-23: its last release holds no code and requires `omnisense/omniauth`, whose `Omniauth\OAuth\` has the same namespace and class names |
 
 ### Decisions it carries
 

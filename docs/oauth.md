@@ -6,12 +6,12 @@ order: 36
 # Identity providers (OAuth 2, OpenID Connect)
 
 ```sh
-composer require omniscient/omniauth omniauth/google
+composer require omnisense/omniauth omniauth/google
 ```
 
 The mechanics every provider shares are omniauth's own, under `Omniauth\OAuth\` (they were the
 package omniauth/oauth until 2026-10-23: same namespace, same class names); omniauth requires no
-OAuth library. Each provider is a package of its own - [omniauth/google](https://github.com/glitchr-studio/omniauth-google)
+OAuth library. Each provider is a package of its own - [omniauth/google](https://github.com/glitchr-omnisense/omniauth-google)
 first, which brings league/oauth2-client and league/oauth2-google. No bundle, no framework: the
 links between your accounts and their providers stay in your table, behind omniauth's
 `Contract\Identities` (a provider, the person's identifier there - `sub` -, the account).
@@ -170,7 +170,7 @@ A provider (`Provider\Provider`) gives the authorization address for an `Authori
 verifier, nonce, the origin the trip began at) and, for the code that came back, the `Identity` it
 vouches for - or throws a `ProviderError` with a stable reason. omniauth has none that speaks
 to a real server: **each provider is a package of its own** (Marco's decision, 2026-10-21, the shape
-of omnishield's captchas) - [omniauth/google](https://github.com/glitchr-studio/omniauth-google)
+of omnishield's captchas) - [omniauth/google](https://github.com/glitchr-omnisense/omniauth-google)
 first, over league/oauth2-google.
 
 ## The return address

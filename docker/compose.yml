@@ -1,4 +1,4 @@
-# omniscient/omniauth with every omniauth/* method package:
+# omnisense/omniauth with every omniauth/* method package:
 #
 #   docker compose run --rm omniauth test     # every package's tests (scheb/2fa beside them, for the trusted-device tokens)
 #   docker compose run --rm omniauth bare     # plain PHP: a whole sign-in by hand - and what PHP loaded
@@ -12,7 +12,7 @@ name: omniauth-harness
 services:
   omniauth:
     build: .
-    image: omniscient/omniauth-harness
+    image: omnisense/omniauth-harness
     # One service, no server beside it: Docker's default bridge, no network of its own to create.
     network_mode: bridge
     env_file:

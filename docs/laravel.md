@@ -15,7 +15,7 @@ namespace at its 1.x branch.
 ## Turning it on
 
 ```sh
-composer require omniscient/omniauth omnibridge/laravel
+composer require omnisense/omniauth omnibridge/laravel
 php artisan vendor:publish --tag=omniauth-config      # config/omniauth.php, to edit
 ```
 
@@ -175,7 +175,7 @@ from any route but the page, its check, the sign-out's two routes and `second_fa
 
 ## With omnibase
 
-With `stores: 'omnibase'` and omniscient/omnibase 4.x, `Auth\OmnibaseEffects` registers what a
+With `stores: 'omnibase'` and omnisense/omnibase 4.x, `Auth\OmnibaseEffects` registers what a
 sign-in does around omniauth under Symfony, with the same omnibase classes: the browsers an account
 signs in from (`Base\Security\ConnectionTracker`), the new device warned of, the captcha after
 failed sign-ins from an address (`Base\Security\SignInCaptcha`, its gateway `config/omnishield.php`'s,

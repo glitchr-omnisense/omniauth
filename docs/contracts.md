@@ -50,7 +50,7 @@ objects ([Testing](testing.md)).
 | Keep the attempt between two requests | `State` (`get`, `set`, `remove`; arrays of scalars) | `ArrayState` (over `$_SESSION`: `ArrayState::session()`) | the session (`SessionState` in each bridge) |
 | Limit the tries | `Throttle` (`consume(string $scope, string $key): bool`, `reset(string $scope, string $key)`) | `CacheThrottle` on any PSR-6 pool or PSR-16 cache | `CacheThrottle` on a cache pool (Symfony) or a cache store (Laravel) |
 | Send a link or a code | `Sender` (`send(object $account, Message $message)`) | `Testing\RecordingSender` | omnibase's `NotifierSender` |
-| CSRF on every POST | `Omnibridge\Contract\Tokens` (omniscient/omnibridge) | your form's own | each bridge's `Tokens` |
+| CSRF on every POST | `Omnibridge\Contract\Tokens` (omnisense/omnibridge) | your form's own | each bridge's `Tokens` |
 | Events | PSR-14, optional | any dispatcher | the host's dispatcher |
 | Clock | PSR-20, optional | `SystemClock` | the container's clock |
 | The second-factor rule | `SecondFactorPolicy` (`required(object $account, array $passed, Context $context): list<Factor>`) | `EnrolledSecondFactors` | the same, decorated by omnibase's rule |

@@ -6,7 +6,7 @@ use Omniauth\Omniauth;
 use PHPUnit\Framework\TestCase;
 
 /**
- * omniscient/omniauth with no framework: in PHP processes of their own (this
+ * omnisense/omniauth with no framework: in PHP processes of their own (this
  * one has loaded PHPUnit), the harness's bare script signs in by hand - a
  * password, a code by e-mail, a trusted browser, a backup code, a link, a
  * password hashed by Symfony past 72 bytes, the throttle - and every class

@@ -14,7 +14,7 @@ omnibridge/symfony's `Auth\` namespace at its 1.x branch.
 ## Registering
 
 ```sh
-composer require omniscient/omniauth omnibridge/symfony
+composer require omnisense/omniauth omnibridge/symfony
 ```
 
 `Omnibridge\Symfony\OmnibridgeBundle` (omnibridge/symfony's bundle) registers omniauth's container

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Every method package: its slug (omniauth/<slug>, github.com/glitchr-studio/omniauth-<slug>),
+ * Every method package: its slug (omniauth/<slug>, github.com/glitchr-omnisense/omniauth-<slug>),
  * its tests' namespace, and what its tests need beside it in the harness (development
  * requirements). omniauth/webauthn and omniauth/otp (step AU3, formerly omniauth/passkey and
  * omniauth/totp), omniauth/google (one package per provider; the mechanics they share,

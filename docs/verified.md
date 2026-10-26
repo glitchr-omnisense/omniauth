@@ -59,6 +59,6 @@ each request under one container) and of omnibridge/laravel; they were not run f
 
 ## Responsibility
 
-omniscient/omniauth and its `omniauth/*` packages are independent code: omniauth/google is an
+omnisense/omniauth and its `omniauth/*` packages are independent code: omniauth/google is an
 unofficial client of Google's sign-in, not affiliated with or endorsed by Google, and whoever runs
 it complies with Google's terms for its APIs. The MIT licence covers this code only.
