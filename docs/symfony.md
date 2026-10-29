@@ -118,10 +118,10 @@ tree with Symfony's Config `Processor` in omnibridge/symfony's image on 2026-10-
 | `oauth.providers.<name>.scopes` | list of strings | `[]` | omniauth/google's default when empty: `openid email profile` |
 | `oauth.providers.<name>.hosted_domain` | string or null | `null` | Google Workspace domain, or `*` for any |
 | `oauth.providers.<name>.type` | string or null | `null` | the kind a factory makes; null: the entry's name |
-| `oauth.providers.<name>.class`, `.options`, `.fields` | string, any, any | `null`, `[]`, `[]` | declared; read by no factory shipped (see below) |
 | `oauth.providers.<name>.service` | service id or null | `null` | a service that is the provider (`Omniauth\OAuth\Provider\Provider`), in place of the keys above |
 | `oauth.providers.<name>.start_path`, `.start_route` | string or null | `/connect/<name>`, `oauth_<name>` | the trip out (GET) |
 | `oauth.providers.<name>.check_path`, `.check_route` | string or null | `/connect/<name>/check`, `oauth_<name>_check` | the return (GET) |
+| `oauth.providers.<name>.<any other key>` | any | - | kept and handed to the factories as it is (a factory of the application's reads its own keys) |
 | `second_factor.after` | list of factor names | `[password, link, oauth]` | the first factors a second one follows (`EnrolledSecondFactors`) |
 | `second_factor.form_path`, `.form_route` | string | `/login/2fa`, `2fa_login` | the second factor's page (GET) |
 | `second_factor.check_path`, `.check_route` | string | `/login/2fa/check`, `2fa_login_check` | where its form posts |
@@ -132,13 +132,6 @@ tree with Symfony's Config `Processor` in omnibridge/symfony's image on 2026-10-
 | `throttle.pool` | service id | `cache.app` | a PSR-6 pool: the tries counted, and the TOTP steps used |
 | `throttle.limits.<scope>` | `[tries, seconds]` | `[]`: `CacheThrottle::LIMITS` | replaces a scope's limit ([Configuration](configuration.md#the-throttles-limits)) |
 | `messages.<failure>` or `messages.<failure>:<reason>` | string | `[]` | a page's message for a failure, `%reason%` replaced ([below](#messages)) |
-
-> [!WARNING]
-> Known defect: `oauth.providers.<name>.class`, `options` and `fields` are accepted by the tree and
-> handed to the provider factories, but no factory shipped reads them (omniauth/google's
-> `GoogleFactory` reads `client_id`, `client_secret`, `redirect_uri`, `scopes`, `hosted_domain` and
-> `type`), where the names suggest a league provider class, its options and its fields. A provider
-> of another kind is given as a `service`, or made by an application's own factory.
 
 ## Services
 
