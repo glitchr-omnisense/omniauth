@@ -81,7 +81,9 @@ identifier typed, the account when known, the reason - never the secret).
 
 `begin()` follows the first steps of the same sequence: a first factor restarts the attempt, a
 second one needs the attempt in progress and a factor it offered; the throttle's scope is
-`<factor>.begin` (`link.begin`, `email-code.begin`: what sends something); `Event\Beginning` may
+`<factor>.begin` (`link.begin`, `email-code.begin`: what sends something), keyed by the address
+typed alone for a first factor (`identifier:ringo@example.org`, lower case: what is sent goes to
+that address, whichever network asks), as a verification is otherwise; `Event\Beginning` may
 refuse; the method's challenge is returned and the attempt saved. A method that is not
 `Challenging` has nothing to begin: `LogicException`.
 

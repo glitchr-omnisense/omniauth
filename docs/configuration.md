@@ -72,7 +72,7 @@ the defaults scope by scope:
 | Scope | Tries | Window | What it limits |
 |---|---|---|---|
 | `password` | 5 | 60 s | password checks, per identifier and visitor's address |
-| `link.begin` | 3 | 3600 s | sign-in links sent, per identifier and visitor's address |
+| `link.begin` | 3 | 3600 s | sign-in links sent, per address typed (whatever the visitor's address) |
 | `email-code` | 5 | 900 s | e-mailed codes checked, per account |
 | `email-code.begin` | 3 | 900 s | e-mailed codes sent, per account |
 | `backup-code` | 5 | 900 s | backup codes checked, per account |
@@ -81,7 +81,8 @@ the defaults scope by scope:
 
 The scopes are the factor's value for a verification (and an enrolment's confirmation), the
 factor's value and `.begin` for a beginning. The keys are the conductor's: `<identifier in lower
-case>|<ip>` for a first factor (`-` without an address), `account:<handle>` once the account is
+case>|<ip>` for a first factor (`-` without an address), `identifier:<identifier in lower case>`
+for a first factor's beginning with an address typed, `account:<handle>` once the account is
 known. A try is counted before the check; a success resets its scope and key. The window starts at
 the first try and lasts its seconds; the cache entry expires with it. Keys are hashed (SHA-256,
 under `$prefix`), so any identifier is a valid cache key.

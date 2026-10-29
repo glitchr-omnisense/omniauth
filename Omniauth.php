@@ -103,7 +103,9 @@ final class Omniauth
             return Challenge::failed(Failure::NotOffered);
         }
         $identifier = $first ? ($proof->string('identifier') ?: null) : null;
-        $key = $this->key($attempt, $identifier, $context);
+        // What a beginning sends goes to the address typed: its limit is the address's (QA4: 3 links an
+        // hour for an address), whichever network asks - not one per visitor's address.
+        $key = null !== $identifier ? 'identifier:'.strtolower($identifier) : $this->key($attempt, $identifier, $context);
         if (null !== $this->throttle && !$this->throttle->consume($factor->value.'.begin', $key)) {
             $this->dispatch(new SignInFailed($factor, Failure::Throttled, $context, $identifier, $attempt->account()));
 
@@ -322,7 +324,8 @@ final class Omniauth
      * The throttle's key: what the visitor typed and their address for a
      * first factor (as Symfony's login throttling), the account itself for a
      * second factor and an enrolment - whatever the address, so that a code
-     * cannot be guessed from many.
+     * cannot be guessed from many. A first factor's beginning with an address
+     * typed is keyed by the address alone (begin()).
      */
     private function key(Attempt $attempt, ?string $identifier, Context $context): string
     {

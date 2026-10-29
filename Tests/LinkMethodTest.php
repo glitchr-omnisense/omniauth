@@ -89,6 +89,19 @@ final class LinkMethodTest extends TestCase
         self::assertSame(Challenge::SENT, $kit->omniauth->begin('link', Kit::context(), ['identifier' => 'ringo'])->kind);
     }
 
+    /** QA4: 3 links an hour for an address - a mailbox's limit, whichever network the requests come from. */
+    public function testThreeRequestsAnHourForAnAddressWhateverTheVisitorsAddress(): void
+    {
+        $kit = new Kit();
+        foreach (['203.0.113.7', '198.51.100.9', '192.0.2.44'] as $ip) {
+            self::assertSame(Challenge::SENT, $kit->omniauth->begin('link', Kit::context(ip: $ip), ['identifier' => 'ringo'])->kind);
+        }
+
+        self::assertSame(Failure::Throttled, $kit->omniauth->begin('link', Kit::context(ip: '233.252.0.1'), ['identifier' => 'Ringo'])->failure, 'a fourth network, the address in capitals');
+        self::assertSame(3, $kit->sender->count());
+        self::assertSame(Challenge::SENT, $kit->omniauth->begin('link', Kit::context(ip: '203.0.113.7'), ['identifier' => 'john@example.org'])->kind, 'another address: its own three');
+    }
+
     public function testAnUnknownOrEmptyTokenIsRefused(): void
     {
         $kit = new Kit();

@@ -17,8 +17,8 @@ By Marco's decision QA4 (2026-10-20):
 - **hashed**: the token is 32 random bytes (base64url, 43 characters) sent to the account; the store
   keeps its SHA-256 (`LinkMethod::hash()`), so whoever reads the table cannot sign in with it;
 - **a new link at each request** (the old "a link is still valid, nothing sent" is gone), 3 an hour
-  (`link.begin` in `CacheThrottle::LIMITS`), counted per address typed and visitor's address (see
-  below);
+  (`link.begin` in `CacheThrottle::LIMITS`), counted per address typed (lower case), whichever
+  network the requests come from;
 - the same answer whether the address has an account or not, and nothing sent for one that has none.
 
 The message (`Message`: the factor, the token as `secret`, `until`) goes to the host's `Sender`,
@@ -71,8 +71,8 @@ echo $omniauth->verify('link', $context, ['token' => $token])->failure->value, "
 foreach (range(1, 2) as $i) {
     $omniauth->begin('link', $context, ['identifier' => 'ringo@example.org']);
 }
-echo $omniauth->begin('link', $context, ['identifier' => 'ringo@example.org'])->failure?->value, " at the fourth link of the hour from one address\n";
-echo $omniauth->begin('link', new Context(ip: '198.51.100.9'), ['identifier' => 'ringo@example.org'])->kind, " from another address\n";
+echo $omniauth->begin('link', $context, ['identifier' => 'ringo@example.org'])->failure?->value, " at the fourth link of the hour for one address\n";
+echo $omniauth->begin('link', new Context(ip: '198.51.100.9'), ['identifier' => 'ringo@example.org'])->failure?->value, " from another network too\n";
 ```
 
 ```
@@ -81,15 +81,9 @@ sent, 1 sent
 43 characters, good for 900 seconds
 authenticated as ringo, remember: true
 invalid-link the second time
-throttled at the fourth link of the hour from one address
-sent from another address
+throttled at the fourth link of the hour for one address
+throttled from another network too
 ```
-
-> [!WARNING]
-> Known defect: the limit of 3 links an hour is counted per address typed **and** visitor's
-> address (the conductor's first-factor key, `ringo@example.org|203.0.113.7`), so a mailbox
-> receives 3 more links an hour from each other network address, where "3 an hour for an address"
-> (decision QA4, `LinkMethod`'s docblock) reads as a limit per mailbox.
 
 Under Symfony the link's page is the application's route `link.route` (a GET with the token signs
 in through the authenticator); under Laravel the bridge's `security_loginWithToken`
