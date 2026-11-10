@@ -11,12 +11,17 @@ from the checkouts beside this one when `OMNIAUTH_PLUGINS=../..` is set in `dock
 are compared with its encoder's, omniauth/otp's codes with its TOTP authenticator's), and what each
 method package's tests need beside it (`docker/harness/plugins.php`: doctrine/dbal and
 web-auth/webauthn-symfony-bundle for omniauth/webauthn's comparison with the bundle's records).
-Nothing runs on the host.
+omnisense/contracts, the kernel the core requires, comes from its checkout when
+`OMNISENSE_CONTRACTS=../../../omnisense-contracts` is set in `docker/.env` (its tests then run with
+the family's), from GitHub otherwise. The image may be another family's harness tagged
+(`docker tag omnisense/<family>-harness omnisense/omniauth-harness`): the compose file names the
+entrypoint. Nothing runs on the host.
 
 ```sh
 cd docker && cp .env.dist .env       # the checkouts of the workspace
 docker compose run --rm omniauth test     # every package's tests
 docker compose run --rm omniauth bare     # plain PHP: a whole sign-in by hand, and what PHP loaded
+docker compose run --rm omniauth phpstan  # PHPStan at level max on each package, its baseline included
 docker compose down -v
 ```
 
@@ -24,7 +29,7 @@ docker compose down -v
 e-mail and "trust this browser", then the same account on that browser with no code; a backup code;
 a link, then the same link again; a password of 102 bytes hashed by Symfony; six wrong passwords.
 `Tests/BareTest` runs it, and loads every class of the package, in PHP processes of their own, and
-checks that nothing is loaded but omniauth, the PSR interfaces and symfony/password-hasher - not a
+checks that nothing is loaded but omniauth, omnisense/contracts, the PSR interfaces and symfony/password-hasher - not a
 class of a framework, of scheb/2fa or of an application, though the harness has them installed.
 
 ## Running a script of your own

@@ -9,6 +9,7 @@ use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
 use League\OAuth2\Client\Provider\GenericProvider;
 use Omniauth\OAuth\Authorization;
+use Omniauth\OAuth\Exception\ProviderError;
 use Omniauth\OAuth\Provider\LeagueProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -46,6 +47,38 @@ final class LeagueProviderTest extends TestCase
         self::assertSame([$authorization->verifier, 'https://example.org/connect/gitea/check'], [$form['code_verifier'], $form['redirect_uri']]);
         self::assertSame(['gitea', '42', 'ringo@example.org', 'Ringo'], [$identity->provider, $identity->subject, $identity->email, $identity->name]);
         self::assertFalse($identity->emailVerified, 'a provider that says nothing of the address does not vouch for it: no linking by it');
+    }
+
+    /**
+     * A refused exchange is a ProviderError - the sign-in refused, as before - whose traces
+     * (its own and league's or Guzzle's under it) hold no argument: neither the code nor the
+     * PKCE verifier nor the client's secret reach a log that prints them.
+     */
+    public function testARefusedExchangeKeepsNoCredentialInItsTraces(): void
+    {
+        $stack = HandlerStack::create(new MockHandler([
+            new Response(400, ['Content-Type' => 'application/json'], '{"error":"invalid_grant"}'),
+        ]));
+        $league = new GenericProvider([
+            'clientId' => 'gt-id', 'clientSecret' => 'gt-very-secret', 'redirectUri' => 'https://unused.example/cb',
+            'urlAuthorize' => 'https://git.example/a', 'urlAccessToken' => 'https://git.example/t', 'urlResourceOwnerDetails' => 'https://git.example/u',
+        ], ['httpClient' => new Client(['handler' => $stack])]);
+        $authorization = Authorization::fresh('https://example.org');
+
+        try {
+            (new LeagueProvider('gitea', $league))->identify('the-one-time-code', $authorization);
+            self::fail('A refused exchange signs nobody in.');
+        } catch (ProviderError $e) {
+            self::assertSame(ProviderError::EXCHANGE, $e->reason);
+            self::assertNotNull($e->getPrevious(), 'league\'s failure kept for the log');
+            for ($one = $e; null !== $one; $one = $one->getPrevious()) {
+                $trace = $one->getTraceAsString();
+                foreach (['the-one-time-code', $authorization->verifier, 'gt-very-secret'] as $secret) {
+                    self::assertStringNotContainsString($secret, $trace);
+                }
+                self::assertSame([], array_filter($one->getTrace(), static fn (array $frame): bool => isset($frame['args'])));
+            }
+        }
     }
 
     public function testALeagueProviderThatDrawsItsOwnVerifierIsRefused(): void

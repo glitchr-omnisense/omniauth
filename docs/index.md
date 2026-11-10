@@ -110,4 +110,5 @@ Marco's decisions of 2026-10-20 (QA1 to QA9 of the omniauth plan), which the cod
 - [Configuration reference](configuration.md): every constructor's options, the throttle's limits.
 - [Errors](errors.md): what is a failure in the result, and what is an exception.
 - [Testing](testing.md), [the Docker harness](harness.md),
-  [writing a method or a provider](providers.md), [Verified, and not](verified.md).
+  [writing a method or a provider](providers.md), [usage policies](policies.md),
+  [Verified, and not](verified.md).

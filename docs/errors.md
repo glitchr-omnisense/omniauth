@@ -12,14 +12,15 @@ and the application's mistakes, and the one refusal a store throws on purpose.
 
 ## The exceptions
 
-Every exception class of omniauth implements `Omniauth\Exception\OmniauthException` (a
-`\Throwable`):
+Every exception class of omniauth implements `Omniauth\Exception\OmniauthException`, which
+extends omnisense/contracts' `Omnisense\Contracts\Exception\ExceptionInterface` (a `\Throwable`):
+one catch holds the failures of every omni family.
 
 | Exception | Extends | Thrown |
 |---|---|---|
 | `Exception\AccountRefused` | `\RuntimeException` | by the application's `Accounts::check()`: the account may not sign in now. `$reason` (`banned`, `locked`...) is the stable word; the conductor catches it and answers `account-refused` with that reason. Message: `The account may not sign in: banned.` |
 | `Exception\UnknownMethod` | `\InvalidArgumentException` | `Methods::get()` (so `begin()`, `verify()`, `enrol()`, `revoke()`) for a factor no method was mounted for. Message: `No method is mounted for "totp"; mounted: password.` |
-| `OAuth\Exception\ProviderError` | `\RuntimeException` | by a provider (`Provider::identify()`): it vouched for nobody. `$reason`: `exchange-failed` (`ProviderError::EXCHANGE`), `invalid-id-token` (`ID_TOKEN`), `no-subject` (`SUBJECT`), `hosted-domain` (`HOSTED_DOMAIN`). `OAuthMethod` catches it and answers `bad-credentials` with that reason; the message (and the previous exception, league's or Guzzle's) is for the server's log, never the page |
+| `OAuth\Exception\ProviderError` | `\RuntimeException` | by a provider (`Provider::identify()`): it vouched for nobody. `$reason`: `exchange-failed` (`ProviderError::EXCHANGE`), `invalid-id-token` (`ID_TOKEN`), `no-subject` (`SUBJECT`), `hosted-domain` (`HOSTED_DOMAIN`). `OAuthMethod` catches it and answers `bad-credentials` with that reason; the message (and the previous exception, league's or Guzzle's) is for the server's log, never the page; their traces carry no arguments (no code, PKCE verifier or client secret) |
 | `Omniauth\Otp\Exception\UnreadableSecret` (omniauth/otp) | `\RuntimeException` | a sealed TOTP secret that does not open (another key, an altered row): not caught by the method - a sign-in with that factor fails loudly rather than letting the account in without it |
 
 ## Programming errors

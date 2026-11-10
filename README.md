@@ -88,7 +88,7 @@ The manual, in `docs/` (one page on the site, in this order):
 - [The second-factor rule](docs/second-factor.md), [Events](docs/events.md)
 - [Configuration reference](docs/configuration.md), [Errors](docs/errors.md)
 - [Testing](docs/testing.md), [The Docker harness](docs/harness.md)
-- [Writing a method or a provider](docs/providers.md), [Verified, and not](docs/verified.md)
+- [Writing a method or a provider](docs/providers.md), [Usage policies](docs/policies.md), [Verified, and not](docs/verified.md)
 
 ## Verified, and not
 

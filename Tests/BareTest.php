@@ -11,9 +11,9 @@ use PHPUnit\Framework\TestCase;
  * password, a code by e-mail, a trusted browser, a backup code, a link, a
  * password hashed by Symfony past 72 bytes, the throttle - and every class
  * of the package is loaded. Nothing may come from outside the package but
- * the PSR interfaces it requires and symfony/password-hasher (a standalone
- * component): no class of a framework, an ORM, a template engine, scheb/2fa
- * or an application - even in the harness, where scheb/2fa and Symfony's
+ * omnisense/contracts (the omni families' kernel), the PSR interfaces it
+ * requires and symfony/password-hasher (a standalone component): no class
+ * of a framework, an ORM, a template engine, scheb/2fa or an application - even in the harness, where scheb/2fa and Symfony's
  * bundles are installed beside it. The sign-in through an identity provider
  * (Omniauth\OAuth\, formerly omniauth/oauth) by hand too, on the fake
  * provider: no OAuth library loaded - league/oauth2-client is the provider
@@ -22,7 +22,7 @@ use PHPUnit\Framework\TestCase;
 final class BareTest extends TestCase
 {
     private const FOREIGN = '~^(?:Symfony\\\\(?!Component\\\\PasswordHasher\\\\|Polyfill\\\\)|Omniauth\\\\(?:WebAuthn|Otp|Passkey|Totp|Google)\\\\|(?:Illuminate|Laravel|Doctrine|Twig|Scheb|Lcobucci|OTPHP|Webauthn|League|GuzzleHttp|Omnibridge|Base|App)\\\\)~';
-    private const ALLOWED_FILES = '~/vendor/(?:psr/(?:cache|clock|event-dispatcher|simple-cache)|symfony/password-hasher|composer)/|/vendor/autoload\.php$~';
+    private const ALLOWED_FILES = '~/vendor/(?:omnisense/contracts|psr/(?:cache|clock|event-dispatcher|simple-cache)|symfony/password-hasher|composer)/|/vendor/autoload\.php$~';
 
     public function testASignInByHandLoadsNothingButOmniauthThePsrInterfacesAndThePasswordHasher(): void
     {
@@ -109,9 +109,11 @@ final class BareTest extends TestCase
     private static function outside(array $files, array $eager): array
     {
         $root = realpath(\dirname(__DIR__)).'/';
+        // omnisense/contracts, the kernel the core requires, wherever it is installed (a harness's checkout).
+        $contracts = realpath(\dirname((string) (new \ReflectionClass(\Omnisense\Contracts\Exception\ExceptionInterface::class))->getFileName(), 2)).'/';
         $eager = array_map('dirname', array_filter($eager));
 
-        return array_values(array_filter($files, static fn (?string $file) => null !== $file && (!str_starts_with($file, $root) || str_starts_with($file, $root.'vendor/')) && !\in_array(\dirname($file), $eager, true) && !preg_match(self::ALLOWED_FILES, $file)));
+        return array_values(array_filter($files, static fn (?string $file) => null !== $file && (!str_starts_with($file, $root) || str_starts_with($file, $root.'vendor/')) && !str_starts_with($file, $contracts) && !\in_array(\dirname($file), $eager, true) && !preg_match(self::ALLOWED_FILES, $file)));
     }
 
     /** The autoloader that knows omniauth and its tests: not the one that loaded PHPUnit first, should they differ. */

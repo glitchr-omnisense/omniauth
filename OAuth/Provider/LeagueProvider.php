@@ -8,6 +8,7 @@ use League\OAuth2\Client\Token\AccessTokenInterface;
 use Omniauth\OAuth\Authorization;
 use Omniauth\OAuth\Exception\ProviderError;
 use Omniauth\OAuth\Identity;
+use Omnisense\Contracts\Http\Redaction;
 
 /**
  * A league/oauth2-client provider as omniauth's Provider - the ground of
@@ -78,7 +79,8 @@ class LeagueProvider implements Provider
         try {
             $token = $this->league->getAccessToken('authorization_code', ['code' => $code, 'code_verifier' => $authorization->verifier] + $this->returnTo($authorization));
         } catch (\Throwable $e) {
-            throw new ProviderError(ProviderError::EXCHANGE, $e->getMessage(), $e);
+            // Out of the traces: the code, the PKCE verifier, the client's secret in the request's options.
+            throw Redaction::withoutArguments(new ProviderError(ProviderError::EXCHANGE, $e->getMessage(), $e));
         }
 
         return $this->identity($token, $authorization);
@@ -130,7 +132,7 @@ class LeagueProvider implements Provider
             // league/oauth2-google's check of the hosted domain, on the userinfo.
             $hosted = $e instanceof \League\OAuth2\Client\Exception\HostedDomainException;
 
-            throw new ProviderError($hosted ? ProviderError::HOSTED_DOMAIN : ProviderError::EXCHANGE, $e->getMessage(), $e);
+            throw Redaction::withoutArguments(new ProviderError($hosted ? ProviderError::HOSTED_DOMAIN : ProviderError::EXCHANGE, $e->getMessage(), $e));
         }
 
         return ['__id' => $owner->getId()] + $owner->toArray();

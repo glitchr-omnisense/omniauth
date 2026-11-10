@@ -3,7 +3,8 @@
 /**
  * The harness's composer.json and phpunit.xml: this core from its checkout,
  * each method package from a checkout under /omniauth/plugins when there is
- * one, from GitHub (branch 1.x) otherwise; every package's tests in one run.
+ * one, from GitHub (branch 1.x) otherwise, omnisense/contracts the same way
+ * from /omnisense/contracts; every package's tests in one run.
  * scheb/2fa is a development dependency here only: the trusted-device tests
  * compare omniauth's tokens with its JwtTokenEncoder's, omniauth/totp's its
  * TOTP codes; league/oauth2-client for the core's LeagueProvider tests (omniauth
@@ -21,6 +22,21 @@ $tests = ['Omniauth\\Tests\\' => "$core/Tests/"];
 $suites = ['core' => "$core/Tests"];
 $packages = [];
 $dev = [];
+
+// omnisense/contracts, the kernel the family builds on: its checkout under /omnisense/contracts
+// (OMNISENSE_CONTRACTS in .env) when there is one, its tests run beside the family's; GitHub otherwise.
+$contracts = '/omnisense/contracts';
+$meta = is_file("$contracts/composer.json") ? json_decode((string) file_get_contents("$contracts/composer.json"), true) : null;
+if (($meta['name'] ?? null) === 'omnisense/contracts') {
+    $repositories[] = ['type' => 'path', 'url' => $contracts, 'options' => ['symlink' => true, 'versions' => ['omnisense/contracts' => '1.x-dev']]];
+    $tests['Omnisense\\Contracts\\Tests\\'] = "$contracts/Tests/";
+    $suites['contracts'] = "$contracts/Tests";
+    $packages['contracts'] = 'checkout';
+} else {
+    $repositories[] = ['type' => 'git', 'url' => 'https://github.com/glitchr-omnisense/contracts.git'];
+    $packages['contracts'] = 'github';
+}
+$require['omnisense/contracts'] = '1.x-dev';
 foreach ($plugins as $slug => $plugin) {
     [$testsNs, $needs] = $plugin + [1 => []];
     $dev += $needs;
@@ -51,6 +67,7 @@ $composer = [
     'require' => $require + ['php' => '>=8.2'],
     'require-dev' => [
         'league/oauth2-client' => '^2.7',
+        'phpstan/phpstan' => '^2.1',
         'phpunit/phpunit' => '^11.0',
         'scheb/2fa' => '^8.0',
         'symfony/cache' => '^6.4|^7.0|^8.0',
