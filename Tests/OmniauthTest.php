@@ -90,6 +90,7 @@ final class OmniauthTest extends TestCase
     {
         $kit = new Kit();
         $guard = new class implements EventDispatcherInterface {
+            /** @var list<object> */
             public array $seen = [];
 
             public function dispatch(object $event): object
