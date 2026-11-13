@@ -5,6 +5,36 @@ Who signs in, and by which factors, **under any PHP host**: the methods and thei
 what remains. The host keeps its firewall or guard, the request and the response, its session
 cookie and its pages; the application keeps its accounts and their proofs in its own tables.
 
+## Installation and a first call
+
+```sh
+composer require omnisense/omniauth
+```
+
+No account anywhere, no server: a password checked in plain PHP, the in-memory stores of
+`Omniauth\Testing` standing in for the application's tables (signing in with Google needs a Google
+OAuth client of one's own, and `omniauth/google`):
+
+```php
+require __DIR__.'/vendor/autoload.php';
+
+use Omniauth\{ArrayState, Context, Omniauth};
+use Omniauth\Method\Methods;
+use Omniauth\Password\PasswordMethod;
+use Omniauth\Testing\{InMemoryStore, TestAccount};
+use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
+
+$hasher = new NativePasswordHasher();
+$store = new InMemoryStore(new TestAccount('42', 'ringo', 'ringo@example.org', $hasher->hash('yellow-submarine')));
+$session = [];
+$omniauth = new Omniauth(accounts: $store, methods: new Methods([new PasswordMethod($store, $store, $hasher)]), state: new ArrayState($session));
+
+$result = $omniauth->verify('password', new Context(origin: 'https://example.org', host: 'example.org'), ['identifier' => 'ringo@example.org', 'password' => 'yellow-submarine']);
+echo $result->status->value, ' as ', $result->account?->identifier, "\n";   // authenticated as ringo
+```
+
+The whole picture, with a second factor:
+
 ```php
 use Omniauth\{ArrayState, CacheThrottle, Context, Omniauth};
 use Omniauth\Method\Methods;

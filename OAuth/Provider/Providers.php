@@ -74,8 +74,14 @@ final class Providers implements \IteratorAggregate, \Countable
         if (!class_exists($factory)) {
             throw new \LogicException('Google moved to its own package: composer require omniauth/google, then Providers::configured($config, new GoogleFactory()).');
         }
-        // omniauth/google's GoogleFactory is a ProviderFactory: configured() takes it as it is.
-        return self::configured($config, new $factory($clock, $collaborators));
+        // omniauth/google's GoogleFactory is a ProviderFactory: configured() takes it as it is. Said
+        // to PHPStan too, which cannot know the class when omniauth/google is not installed beside.
+        $google = new $factory($clock, $collaborators);
+        if (!$google instanceof ProviderFactory) {
+            throw new \LogicException(\sprintf('%s is not a %s: update omniauth/google.', $factory, ProviderFactory::class));
+        }
+
+        return self::configured($config, $google);
     }
 
     public function has(string $name): bool

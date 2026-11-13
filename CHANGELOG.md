@@ -2,6 +2,17 @@
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-13
+
+The first stable version. It requires `omnisense/contracts` `^1.0` with no stability flag, so `composer require omnisense/omniauth` installs it in a project with Composer's default minimum-stability; the 1.x series follows semantic versioning. A tag `vX.Y.Z` is released by `.github/workflows/release.yml` once the package's CI passes on it.
+
+### Fixed
+
+- `Providers::fromConfig()` (deprecated) checks that omniauth/google's factory is a `ProviderFactory`
+  before handing it to `configured()`: PHPStan, run on the package alone (the CI's job, omniauth/google
+  absent), read the factory built from a class name as `mixed` and failed the CI.
+- The README opens on the install line and a first call in plain PHP, with no account.
+
 ### Changed
 
 - omnisense/omniauth requires omnisense/contracts, the kernel of the omni families:
